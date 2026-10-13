@@ -1,9 +1,11 @@
 """Write the medallion ontology (ontology/medallion), the OTO unit this repository publishes.
 
-    python tools/build.py              # writes ontology/medallion
-    python tools/build.py <folder>     # writes it elsewhere (the tests compare the two)
+    python tools/build.py              # writes ontology/medallion and ontology/report-medallion
+    python tools/build.py <folder>     # writes them under another folder (the tests compare the two)
 
-First slice: the rules a declared medallion flow must satisfy.
+Release 1 was the flow slice: the rules a declared medallion flow must satisfy. Release 2 adds the
+design slice (tools/design.py): the classes of steps D1 to D7 and D9, how the flow executes them,
+and the report-medallion bridge.
 
 The flow itself is plain `flow` data (steps, waits, checks, artifacts). This ontology adds the
 medallion's own vocabulary on the flow's terms (the step kinds, a gate's number, a table's layer)
@@ -15,7 +17,12 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "ontology", "medallion")
+sys.path.insert(0, os.path.join(HERE, "tools"))
+import design  # noqa: E402
+
+ROOT_OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "ontology")
+OUT = os.path.join(ROOT_OUT, "medallion")
+BRIDGE_OUT = os.path.join(ROOT_OUT, "report-medallion")
 NS = "https://cynergis.ai/ont/medallion#"
 KINDS = ["create_batch", "check_sources_ready", "copy_to_bronze", "run_gate", "build_reference",
          "build_entity", "build_output", "reconcile", "mark_validated"]
@@ -252,7 +259,8 @@ def sample():
     tables = {"src-fund-holding": ("source.fund_holding", "source"), "src-dim-product": ("source.dim_product", "source"),
               "control-batch": ("control.batch", "control"), "bronze-fund-holding": ("bronze.source__fund_holding", "bronze"),
               "bronze-dim-product": ("bronze.source__dim_product", "bronze"), "silver-fund": ("silver.fund", "silver"),
-              "silver-fund-holding": ("silver.fund_holding", "silver"), "gold-portfolio-holdings": ("gold.portfolio_holdings", "gold")}
+              "silver-fund-holding": ("silver.fund_holding", "silver"), "gold-portfolio-holdings": ("gold.portfolio_holdings", "gold"),
+              "gold-portfolio-allocations": ("gold.portfolio_allocations", "gold")}
     for tid, (path, layer) in tables.items():
         n("artifact." + tid, "Artifact", path, path=path, format="table", layer=layer, carries=["DataStore"])
     n("param.pct-tolerance", "ConfigParameter", "pct_tolerance", paramName="pct_tolerance", value="0.5")
@@ -268,8 +276,9 @@ def sample():
         ("fp-06", "build_entity", None, ["fp-05"], ["bronze-dim-product", "bronze-fund-holding"], ["silver-fund"], None, "build-fund"),
         ("fp-07", "build_entity", None, ["fp-05", "fp-06"], ["bronze-fund-holding", "silver-fund"], ["silver-fund-holding"], None, "build-fund-holding"),
         ("fp-08", "run_gate", 2, ["fp-06", "fp-07"], ["silver-fund", "silver-fund-holding"], [], None, "gate 2"),
-        ("fp-09", "build_output", None, ["fp-08"], ["silver-fund", "silver-fund-holding"], ["gold-portfolio-holdings"], None, "build-portfolio-holdings"),
-        ("fp-10", "run_gate", 3, ["fp-09"], ["gold-portfolio-holdings"], [], None, "gate 3"),
+        ("fp-09", "build_output", None, ["fp-08"], ["silver-fund", "silver-fund-holding"], ["gold-portfolio-holdings"], "gold", "build-portfolio-holdings"),
+        ("fp-09b", "build_output", None, ["fp-08"], ["silver-fund-holding"], ["gold-portfolio-allocations"], "gold", "build-portfolio-allocations"),
+        ("fp-10", "run_gate", 3, ["fp-09", "fp-09b"], ["gold-portfolio-holdings", "gold-portfolio-allocations"], [], None, "gate 3"),
         ("fp-11", "mark_validated", None, ["fp-10"], [], ["control-batch"], None, "mark-validated"),
     ]
     for sid, kind_, gate, waits, reads, writes, group, executes in steps:
@@ -304,7 +313,7 @@ def sample():
     check("no-active-batch", "fp-01", "no batch is active for the period", "control", "count(control.batch where state = active) == 0")
     check("sources-present-for-period", "fp-02", "every expected source has rows for the period end", "control",
           "present_for_period(source.fund_holding) and present_for_period(source.dim_product)")
-    for sid in ("fp-03", "fp-04", "fp-06", "fp-07", "fp-09"):
+    for sid in ("fp-03", "fp-04", "fp-06", "fp-07", "fp-09", "fp-09b"):
         check("%s-rerun" % sid, sid, "%s writes the same rows when re-run" % sid, "rerun", "rows(rerun(batch_id)) == rows(batch_id)", invariant=True)
     check("bronze-keys-unique", "fp-05", "bronze keys are unique", "gate1", "unique(bronze.source__fund_holding, [fund_id, holding_name, effective_date])")
     check("fund-count-equals-expected", "fp-08", "silver fund count equals the expected count", "gate2",
@@ -314,6 +323,59 @@ def sample():
     check("all-gates-passed", "fp-11", "every gate of the batch passed", "control", "state(gate 1) == state(gate 2) == state(gate 3) == passed")
     return {"_about": "The fund-profile flow of the specification's worked instance (section 7), as plain flow data with the "
                       "medallion's kinds, gates and layers. Replace it.", "nodes": nodes, "edges": edges}
+
+
+CONFIG["classes"] = design.CLASSES
+CONFIG["properties"] = design.PROPERTIES
+for _kind, _declared in design.ATTRIBUTES.items():
+    CONFIG["attributes"].setdefault(_kind, {}).update(_declared)
+CONFIG["_about"] = ("The medallion pipeline: its batch flow on the flow's terms (release 1) and its design (release 2): the classes "
+                    "of the specification's steps D1 to D7 and D9, and how the flow executes them. Names follow DECISIONS.md.")
+CONFIG["_summary"] = ("A medallion data pipeline, source systems to bronze, silver and gold: its sources, reference data, conformed "
+                      "entities, gold outputs and contracts, derivation and quality rules, build plan, and the batch flow that "
+                      "executes them, with the rules a design and a declared flow must satisfy.")
+RULES += design.RULES
+QUESTIONS.update(design.QUESTIONS)
+RATIONALE["classes"], RATIONALE["properties"] = design.rationale()
+RATIONALE["_about"] = ("Why each term exists: the specification's step it comes from. The rules carry their own `why`. "
+                       "`validated_by` is empty until a person who knows the domain confirms the entry.")
+MANIFEST["release"] = 2
+MANIFEST["summary"] = CONFIG["_summary"]
+MANIFEST["changelog"] = [
+    {"release": 2, "at": "2026-10-13",
+     "note": "The design slice (spec 1.2.0, D1 to D7 and D9): sources, reference data, conformed entities, datasets, outputs and "
+             "data contracts, derivation and quality rules, identities; a flow step executes the design; correctness as blocking "
+             "rules, completeness as questions that must come back empty. Names per DECISIONS.md."}] + MANIFEST["changelog"]
+_flow_sample = sample
+
+
+def sample():
+    graph = _flow_sample()
+    nodes, edges = design.design_sample(stamp)
+    graph["nodes"] += nodes
+    graph["edges"] += edges
+    graph["_about"] = ("The specification's worked instance (section 7), whole: the fund-profile data product, its two sources, the "
+                       "fund and fund-holding entities, two gold outputs and a contract, the top-10 rule, a hard quality rule at "
+                       "each gate, and the flow that executes them. Neutral source names. Replace it.")
+    return graph
+
+
+README = README.replace("# Medallion pipeline: the flow slice", "# Medallion pipeline") + """
+## The design (release 2)
+
+The classes of the specification's steps D1 to D7 and D9, named per DECISIONS.md, on what
+`product` and `software-architecture` already hold: a data product is a `Product`, a business term
+a `Term`, a source system a `SourceSystem` (a kind of `System`), a dataset a `Dataset` (a kind of
+`DataStore`, so it runs in an environment and has an owner), a contract a `DataContract` (a kind of
+`Interface`, so consumers consume it and versions supersede each other).
+
+A step of the flow `executes` the copy policy, entity, output or rule it runs, and an artifact of
+the flow `represents` its dataset or source table. A design that contradicts itself is refused at
+capture (a field both derived and fed, a rule reading a higher layer, a step executing what its kind
+does not build, two steps executing one thing, an artifact in another layer than its dataset, a
+person writing silver or gold). What is missing is a gap, reported and not blocking: the questions
+MD3 to MD17 must come back empty before a step's checkpoint, as the specification's section 5 lists.
+"""
 
 
 def write(name, payload):
@@ -328,10 +390,69 @@ def write(name, payload):
 os.makedirs(OUT, exist_ok=True)
 write("manifest.json", MANIFEST)
 write("ontology.config.json", CONFIG)
-write("rules.json", {"_about": "The validations of a declared medallion flow (spec 3.8.1, 3.8.2), each naming the question it "
+write("rules.json", {"_about": "The validations of a declared medallion flow (spec 3.8.1, 3.8.2) and of its design (D2 to D9), each naming the question it "
                                "protects.", "rules": RULES})
-write("questions.json", {"_about": "What a medallion flow's reviewer asks.", "questions": QUESTIONS})
+write("questions.json", {"_about": "What a medallion pipeline's reviewers ask: the flow (MD1, MD2), what the design still lacks "
+                                   "(MD3 to MD17, empty when complete), and the catalogue (MD18 to MD20).", "questions": QUESTIONS})
 write("ontology.rationale.json", RATIONALE)
 write("sample.graph.json", sample())
 write("README.md", README)
 print("wrote %s: %d rules, %d questions, %d sample nodes" % (OUT, len(RULES), len(QUESTIONS), len(sample()["nodes"])))
+
+
+# ============================ the bridge: report-medallion ============================
+
+BRIDGE_MANIFEST = {"name": "report-medallion", "release": 1, "domain": "reporting",
+                   "summary": "Where a report meets its pipeline: a report's table is the gold dataset it reads, a column the dataset field "
+                              "behind it, a report's quality check the pipeline rule it relies on.",
+                   "extends": ["report", "medallion"], "namespace": "https://cynergis.ai/ont/report-medallion#",
+                   "engine": ">=0.11.7", "carries": ["vocabulary", "rationale", "rules", "questions", "sample", "readme"],
+                   "maintainer": "Cynergis",
+                   "changelog": [{"release": 1, "at": "2026-10-13",
+                                  "note": "The report link of DECISIONS.md: is_dataset, is_field, backed_by; a report reads gold, a column is "
+                                          "a field of its table's dataset, a read dataset has a contract."}]}
+BRIDGE_CONFIG = {"_about": "A bridge, extending report and medallion, for a report product with a medallion pipeline. Neither ontology "
+                           "carries the other's vocabulary; a project that has both adds this one.",
+                 "_summary": BRIDGE_MANIFEST["summary"], "name": "Report and medallion", "ontology_version": 1,
+                 "strict_domains": False, "languages": ["en"], "classes": {}, "properties": design.BRIDGE_PROPERTIES, "attributes": {}}
+BRIDGE_SAMPLE = {
+    "_about": "The report ontology's sample table read as the medallion sample's gold holdings: two columns, two fields.",
+    "nodes": [],
+    "edges": [{"from": "table.warehouse.reports.fund_profile_balanced", "rel": "is_dataset", "to": "dataset.gold.portfolio_holdings"},
+              {"from": "table.warehouse.reports.fund_profile_balanced.fund_id", "rel": "is_field", "to": "field.gold.portfolio_holdings.fund_id"},
+              {"from": "table.warehouse.reports.fund_profile_balanced.holdings_top_pct", "rel": "is_field",
+               "to": "field.gold.portfolio_holdings.holding_pct"}]}
+BRIDGE_README = """# Report and medallion: the bridge
+
+Extends `report` and `medallion`, so neither carries the other's vocabulary: a report without a
+pipeline, or a pipeline without a report, never sees it. A report product with a medallion pipeline
+adds it when the project starts (`--ontology product-report,ddd,medallion,report-medallion,flow`).
+
+- `is_dataset`: a report's `Table` is the gold `Dataset` it reads; `is_field`: a `Column` is the
+  `DatasetField` behind it. A report reads gold, and a column is a field of its own table's dataset
+  (blocking); a dataset a report reads has a data contract (a warning).
+- `backed_by`: a report's `QualityCheck` relies on the pipeline's `QualityRule`. Two levels, no
+  overlap (DECISIONS.md): the data is checked at its gate; the report checks what it adds.
+
+RM1 is the lineage of a report's value (column, gold field, the rule or the field that feeds it);
+RM2 the checks a report relies on.
+"""
+os.makedirs(BRIDGE_OUT, exist_ok=True)
+_out = OUT
+OUT = BRIDGE_OUT
+write("manifest.json", BRIDGE_MANIFEST)
+write("ontology.config.json", BRIDGE_CONFIG)
+write("rules.json", {"_about": "Where a report meets its pipeline, each rule naming the question it protects.", "rules": design.BRIDGE_RULES})
+write("questions.json", {"_about": "The lineage of a report's value, and the checks it relies on.", "questions": design.BRIDGE_QUESTIONS})
+write("ontology.rationale.json", {"_about": "Why each relation exists. `validated_by` is empty until confirmed.", "classes": {},
+                                  "properties": {
+                                      "is_dataset": {"question": design.BRIDGE_QUESTIONS["RM1"]["question"], "alternatives": "", "validated_by": "",
+                                                     "why": "A report reads a table its pipeline builds; without the link its lineage stops at the report."},
+                                      "is_field": {"question": design.BRIDGE_QUESTIONS["RM1"]["question"], "alternatives": "", "validated_by": "",
+                                                   "why": "A report's value is traced to the gold field, and from there to the rule or the source behind it."},
+                                      "backed_by": {"question": design.BRIDGE_QUESTIONS["RM2"]["question"], "alternatives": "", "validated_by": "",
+                                                    "why": "Two levels, no overlap: a report check that relies on a pipeline rule says so, instead of checking the data again."}}})
+write("sample.graph.json", BRIDGE_SAMPLE)
+write("README.md", BRIDGE_README)
+OUT = _out
+print("wrote %s: %d relations, %d rules, %d questions" % (BRIDGE_OUT, len(design.BRIDGE_PROPERTIES), len(design.BRIDGE_RULES), len(design.BRIDGE_QUESTIONS)))

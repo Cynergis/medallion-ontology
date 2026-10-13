@@ -1,8 +1,8 @@
 {
   "name": "medallion",
-  "release": 1,
+  "release": 2,
   "domain": "data",
-  "summary": "A medallion data pipeline's batch flow: its fixed step kinds, a gate's number, a table's layer, and the rules that make a declared flow valid (order, gate placement, layer direction), checked when the flow is captured.",
+  "summary": "A medallion data pipeline, source systems to bronze, silver and gold: its sources, reference data, conformed entities, gold outputs and contracts, derivation and quality rules, build plan, and the batch flow that executes them, with the rules a design and a declared flow must satisfy.",
   "extends": [
     "software-architecture",
     "flow"
@@ -19,6 +19,11 @@
   ],
   "maintainer": "Cynergis",
   "changelog": [
+    {
+      "release": 2,
+      "at": "2026-10-13",
+      "note": "The design slice (spec 1.2.0, D1 to D7 and D9): sources, reference data, conformed entities, datasets, outputs and data contracts, derivation and quality rules, identities; a flow step executes the design; correctness as blocking rules, completeness as questions that must come back empty. Names per DECISIONS.md."
+    },
     {
       "release": 1,
       "at": "2026-10-13",
