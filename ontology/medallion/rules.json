@@ -1,0 +1,1574 @@
+{
+  "_about": "The validations of a declared medallion flow (spec 3.8.1, 3.8.2), each naming the question it protects.",
+  "rules": [
+    {
+      "id": "medallion-step-declares-its-kind",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "DeterministicStep|OcrStep|ClaudeStep|HumanStep",
+          "where": {
+            "stepKind": {
+              "exists": false
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "a step of a medallion flow declares no step kind"
+      },
+      "why": "The kinds are the flow's vocabulary; a step without one cannot be checked against it (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-step-kind-is-known",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": {
+              "not_in": [
+                "create_batch",
+                "check_sources_ready",
+                "copy_to_bronze",
+                "run_gate",
+                "build_reference",
+                "build_entity",
+                "build_output",
+                "reconcile",
+                "mark_validated"
+              ]
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "the step kind is not one of the medallion's: create_batch, check_sources_ready, copy_to_bronze, run_gate, build_reference, build_entity, build_output, reconcile, mark_validated"
+      },
+      "why": "A flow uses only the fixed kinds, so the implementation agent can emit every step from a template (spec 3.8.1, 3.8.2 Vocabulary).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-gate-has-a-number",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "run_gate",
+            "gate": {
+              "exists": false
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "a run_gate step does not say which gate it runs (1, 2 or 3)"
+      },
+      "why": "Each gate runs at one boundary: 1 landing to bronze, 2 bronze to silver, 3 silver to gold (spec 3.7).",
+      "validated_by": "",
+      "answers": "MD2"
+    },
+    {
+      "id": "medallion-flow-has-create-batch",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "s"
+              ]
+            },
+            {
+              "node": "s",
+              "type": "Step",
+              "where": {
+                "stepKind": "create_batch"
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has no create_batch step"
+      },
+      "why": "Exactly one create_batch per flow (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-flow-has-one-create-batch",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Step",
+          "where": {
+            "stepKind": "create_batch"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "b"
+          ]
+        },
+        {
+          "node": "b",
+          "type": "Step",
+          "where": {
+            "stepKind": "create_batch",
+            "id": {
+              "!=": "$a"
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has more than one create_batch step"
+      },
+      "why": "Exactly one create_batch per flow (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-flow-has-check-sources-ready",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "s"
+              ]
+            },
+            {
+              "node": "s",
+              "type": "Step",
+              "where": {
+                "stepKind": "check_sources_ready"
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has no check_sources_ready step"
+      },
+      "why": "Exactly one check_sources_ready per flow (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-flow-has-one-check-sources-ready",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Step",
+          "where": {
+            "stepKind": "check_sources_ready"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "b"
+          ]
+        },
+        {
+          "node": "b",
+          "type": "Step",
+          "where": {
+            "stepKind": "check_sources_ready",
+            "id": {
+              "!=": "$a"
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has more than one check_sources_ready step"
+      },
+      "why": "Exactly one check_sources_ready per flow (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-flow-has-mark-validated",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "s"
+              ]
+            },
+            {
+              "node": "s",
+              "type": "Step",
+              "where": {
+                "stepKind": "mark_validated"
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has no mark_validated step"
+      },
+      "why": "Exactly one mark_validated per flow (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-flow-has-one-mark-validated",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Step",
+          "where": {
+            "stepKind": "mark_validated"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "b"
+          ]
+        },
+        {
+          "node": "b",
+          "type": "Step",
+          "where": {
+            "stepKind": "mark_validated",
+            "id": {
+              "!=": "$a"
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has more than one mark_validated step"
+      },
+      "why": "Exactly one mark_validated per flow (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-flow-runs-gate-1",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "s"
+              ]
+            },
+            {
+              "node": "s",
+              "type": "Step",
+              "where": {
+                "stepKind": "run_gate",
+                "gate": 1
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has no step that runs gate 1"
+      },
+      "why": "Every gate runs exactly once per batch (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD2"
+    },
+    {
+      "id": "medallion-flow-runs-gate-2",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "s"
+              ]
+            },
+            {
+              "node": "s",
+              "type": "Step",
+              "where": {
+                "stepKind": "run_gate",
+                "gate": 2
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has no step that runs gate 2"
+      },
+      "why": "Every gate runs exactly once per batch (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD2"
+    },
+    {
+      "id": "medallion-flow-runs-gate-3",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "s"
+              ]
+            },
+            {
+              "node": "s",
+              "type": "Step",
+              "where": {
+                "stepKind": "run_gate",
+                "gate": 3
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "the medallion flow has no step that runs gate 3"
+      },
+      "why": "Every gate runs exactly once per batch (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD2"
+    },
+    {
+      "id": "medallion-flow-runs-each-gate-once",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Step",
+          "where": {
+            "stepKind": "run_gate"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "b"
+          ]
+        },
+        {
+          "node": "b",
+          "type": "Step",
+          "where": {
+            "stepKind": "run_gate",
+            "gate": "$a.gate",
+            "id": {
+              "!=": "$a"
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "two steps of the medallion flow run the same gate"
+      },
+      "why": "Every gate runs exactly once per batch (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD2"
+    },
+    {
+      "id": "medallion-sources-checked-after-the-batch-opens",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "check_sources_ready"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "s",
+                "after",
+                "g"
+              ]
+            },
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "g"
+              ]
+            },
+            {
+              "node": "g",
+              "type": "Step",
+              "where": {
+                "stepKind": "create_batch"
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a check_sources_ready step does not come after create_batch"
+      },
+      "why": "The sources are checked for an open batch (spec 3.8.1, order 1-2).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-copy-after-the-sources-are-ready",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "copy_to_bronze"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "s",
+                "after",
+                "g"
+              ]
+            },
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "g"
+              ]
+            },
+            {
+              "node": "g",
+              "type": "Step",
+              "where": {
+                "stepKind": "check_sources_ready"
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a copy_to_bronze step does not come after check_sources_ready"
+      },
+      "why": "A source is copied only when every expected source has rows for the period (spec 3.8.1, order 2-3).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-gate-1-after-every-copy",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "run_gate",
+            "gate": 1
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "e"
+          ]
+        },
+        {
+          "node": "e",
+          "type": "Step",
+          "where": {
+            "stepKind": "copy_to_bronze"
+          }
+        },
+        {
+          "not_edge": [
+            "s",
+            "after",
+            "e"
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a run_gate step (gate 1) runs before a copy_to_bronze step has finished"
+      },
+      "why": "Gate 1 checks the whole of bronze, so it waits for every copy (spec 3.8.1, order 3-4).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-reference-after-gate-1",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "build_reference"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "s",
+                "after",
+                "g"
+              ]
+            },
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "g"
+              ]
+            },
+            {
+              "node": "g",
+              "type": "Step",
+              "where": {
+                "stepKind": "run_gate",
+                "gate": 1
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a build_reference step does not come after run_gate (gate 1)"
+      },
+      "why": "Reference data is built from a bronze that passed gate 1 (spec 3.8.1, order 4-5).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-entity-after-gate-1",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "build_entity"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "s",
+                "after",
+                "g"
+              ]
+            },
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "g"
+              ]
+            },
+            {
+              "node": "g",
+              "type": "Step",
+              "where": {
+                "stepKind": "run_gate",
+                "gate": 1
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a build_entity step does not come after run_gate (gate 1)"
+      },
+      "why": "A silver entity is built only from a bronze that passed gate 1 (spec 3.8.2 Gate placement).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-gate-2-after-every-entity",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "run_gate",
+            "gate": 2
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "e"
+          ]
+        },
+        {
+          "node": "e",
+          "type": "Step",
+          "where": {
+            "stepKind": "build_entity"
+          }
+        },
+        {
+          "not_edge": [
+            "s",
+            "after",
+            "e"
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a run_gate step (gate 2) runs before a build_entity step has finished"
+      },
+      "why": "Gate 2 checks the whole of silver, so it waits for every entity (spec 3.8.1, order 6-7).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-output-after-gate-2",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "build_output"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "s",
+                "after",
+                "g"
+              ]
+            },
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "g"
+              ]
+            },
+            {
+              "node": "g",
+              "type": "Step",
+              "where": {
+                "stepKind": "run_gate",
+                "gate": 2
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a build_output step does not come after run_gate (gate 2)"
+      },
+      "why": "A gold output is built only from a silver that passed gate 2 (spec 3.8.2 Gate placement).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-gate-3-after-every-output",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "run_gate",
+            "gate": 3
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "e"
+          ]
+        },
+        {
+          "node": "e",
+          "type": "Step",
+          "where": {
+            "stepKind": "build_output"
+          }
+        },
+        {
+          "not_edge": [
+            "s",
+            "after",
+            "e"
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a run_gate step (gate 3) runs before a build_output step has finished"
+      },
+      "why": "Gate 3 checks the whole of gold, so it waits for every output (spec 3.8.1, order 8-9).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-reconcile-after-gate-3",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "reconcile"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "s",
+                "after",
+                "g"
+              ]
+            },
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "g"
+              ]
+            },
+            {
+              "node": "g",
+              "type": "Step",
+              "where": {
+                "stepKind": "run_gate",
+                "gate": 3
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a reconcile step does not come after run_gate (gate 3)"
+      },
+      "why": "A gold total is reconciled once gold passed gate 3 (spec 3.8.1, order 9-10).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-validated-after-gate-3",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "mark_validated"
+          }
+        },
+        {
+          "not": [
+            {
+              "edge": [
+                "s",
+                "after",
+                "g"
+              ]
+            },
+            {
+              "edge": [
+                "f",
+                "hasStep",
+                "g"
+              ]
+            },
+            {
+              "node": "g",
+              "type": "Step",
+              "where": {
+                "stepKind": "run_gate",
+                "gate": 3
+              }
+            }
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a mark_validated step does not come after run_gate (gate 3)"
+      },
+      "why": "The batch is validated only after gate 3 (spec 3.8.2 Gate placement).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-validated-after-every-reconcile",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "mark_validated"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "e"
+          ]
+        },
+        {
+          "node": "e",
+          "type": "Step",
+          "where": {
+            "stepKind": "reconcile"
+          }
+        },
+        {
+          "not_edge": [
+            "s",
+            "after",
+            "e"
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a mark_validated step runs before a reconcile step has finished"
+      },
+      "why": "Every reconciliation has run before the batch is handed to approval (spec 3.8.1, order 10-11).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-no-step-reads-above-what-it-writes",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "edge": [
+            "s",
+            "reads",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Artifact",
+          "where": {
+            "layer": "gold"
+          }
+        },
+        {
+          "edge": [
+            "s",
+            "writes",
+            "b"
+          ]
+        },
+        {
+          "node": "b",
+          "type": "Artifact",
+          "where": {
+            "layer": {
+              "in": [
+                "bronze",
+                "silver"
+              ]
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "the step reads gold and writes a lower layer"
+      },
+      "why": "Data moves up the layers, never down (spec 3.8.2 Layer direction).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-no-step-reads-silver-into-bronze",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "edge": [
+            "s",
+            "reads",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Artifact",
+          "where": {
+            "layer": "silver"
+          }
+        },
+        {
+          "edge": [
+            "s",
+            "writes",
+            "b"
+          ]
+        },
+        {
+          "node": "b",
+          "type": "Artifact",
+          "where": {
+            "layer": "bronze"
+          }
+        }
+      ],
+      "then": {
+        "flag": "the step reads silver and writes bronze"
+      },
+      "why": "Data moves up the layers, never down (spec 3.8.2 Layer direction).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-copy-writes-bronze",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "copy_to_bronze"
+          }
+        },
+        {
+          "edge": [
+            "s",
+            "writes",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Artifact",
+          "where": {
+            "layer": {
+              "not_in": [
+                "bronze"
+              ]
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "a copy_to_bronze step writes outside bronze"
+      },
+      "why": "A copy lands one source in bronze, and nothing else (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-entity-writes-silver",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "build_entity"
+          }
+        },
+        {
+          "edge": [
+            "s",
+            "writes",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Artifact",
+          "where": {
+            "layer": {
+              "not_in": [
+                "silver"
+              ]
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "a build_entity step writes outside silver"
+      },
+      "why": "An entity is one silver table (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-output-writes-gold",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "build_output"
+          }
+        },
+        {
+          "edge": [
+            "s",
+            "writes",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Artifact",
+          "where": {
+            "layer": {
+              "not_in": [
+                "gold"
+              ]
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "a build_output step writes outside gold"
+      },
+      "why": "An output is one gold table (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-output-reads-no-other-output",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "build_output"
+          }
+        },
+        {
+          "edge": [
+            "s",
+            "reads",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Artifact",
+          "where": {
+            "layer": "gold"
+          }
+        }
+      ],
+      "then": {
+        "flag": "a build_output step reads a gold table"
+      },
+      "why": "An output reads silver; one output reading another is forbidden (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD1"
+    },
+    {
+      "id": "medallion-gate-writes-no-data",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "f",
+          "type": "Flow",
+          "where": {
+            "flowKind": "medallion"
+          }
+        },
+        {
+          "edge": [
+            "f",
+            "hasStep",
+            "s"
+          ]
+        },
+        {
+          "node": "s",
+          "type": "Step",
+          "where": {
+            "stepKind": "run_gate"
+          }
+        },
+        {
+          "edge": [
+            "s",
+            "writes",
+            "a"
+          ]
+        },
+        {
+          "node": "a",
+          "type": "Artifact",
+          "where": {
+            "layer": {
+              "in": [
+                "bronze",
+                "silver",
+                "gold"
+              ]
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "a run_gate step writes a data layer"
+      },
+      "why": "A gate reads and records; it changes no data (spec 3.8.1).",
+      "validated_by": "",
+      "answers": "MD2"
+    }
+  ]
+}

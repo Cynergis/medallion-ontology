@@ -1,0 +1,96 @@
+{
+  "_about": "What a medallion flow's reviewer asks.",
+  "questions": {
+    "MD1": {
+      "who": "a platform lead",
+      "question": "Which steps make up each medallion flow, of which kind, in which parallel group, reading and writing which layers?",
+      "why": "The declared flow is what a reviewer approves and what the implementation agent emits; each step's kind and layers are what the medallion's rules check (spec 3.8).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "f",
+            "type": "Flow",
+            "where": {
+              "flowKind": "medallion"
+            }
+          },
+          {
+            "edge": [
+              "f",
+              "hasStep",
+              "s"
+            ]
+          },
+          {
+            "node": "s",
+            "type": "Step"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "s",
+                  "reads|writes",
+                  "a"
+                ]
+              },
+              {
+                "node": "a",
+                "type": "Artifact"
+              }
+            ]
+          }
+        ],
+        "select": [
+          "f.label",
+          "s.stepId",
+          "s.stepKind",
+          "s.parallelGroup",
+          "a.path",
+          "a.layer"
+        ]
+      },
+      "gate": "non_empty"
+    },
+    "MD2": {
+      "who": "a platform lead",
+      "question": "Which gate does each run_gate step run, and which checks does it hold, hard or soft?",
+      "why": "A gate is where a batch stops; its checks are the quality rules of that boundary (spec 3.7, 3.8.1).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "s",
+            "type": "Step",
+            "where": {
+              "stepKind": "run_gate"
+            }
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "s",
+                  "hasCheck",
+                  "c"
+                ]
+              },
+              {
+                "node": "c",
+                "type": "Check"
+              }
+            ]
+          }
+        ],
+        "select": [
+          "s.stepId",
+          "s.gate",
+          "c.checkId",
+          "c.blocking"
+        ]
+      },
+      "gate": "non_empty"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "_about": "The medallion pipeline's first slice: the vocabulary and rules a declared medallion flow must satisfy, on the flow's own terms. The flow is plain flow data; a Flow with flowKind medallion is governed by these rules. The design classes (sources, entities, outputs, rules) come in the next slice.",
+  "_summary": "A medallion data pipeline's batch flow: its fixed step kinds, a gate's number, a table's layer, and the rules that make a declared flow valid (order, gate placement, layer direction), checked when the flow is captured.",
+  "name": "Medallion pipeline",
+  "ontology_version": 1,
+  "strict_domains": false,
+  "languages": [
+    "en"
+  ],
+  "classes": {},
+  "properties": {},
+  "attributes": {
+    "Artifact": {
+      "layer": {
+        "type": "enum:source|bronze|silver|gold|control",
+        "label": "layer",
+        "definition": "The layer a table of the pipeline sits in: a source read from outside, bronze (copied as is), silver (conformed), gold (what consumers read), or control (the batch's own records)."
+      }
+    },
+    "Step": {
+      "gate": {
+        "type": "integer",
+        "label": "gate",
+        "definition": "For a run_gate step, the boundary it checks: 1 landing to bronze, 2 bronze to silver, 3 silver to gold."
+      }
+    }
+  }
+}

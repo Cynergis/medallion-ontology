@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: The flow unit (report-ontology, oto/flow)
+        uses: actions/checkout@v4
+        with:
+          repository: Cynergis/report-ontology
+          path: report-ontology
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: The engine, from main
+        run: python -m pip install --upgrade pip && python -m pip install "oto-kg @ git+https://github.com/Cynergis/oto" pytest
+      - name: Tests
+        env:
+          FLOW_ONTOLOGY: report-ontology/oto/flow
+        run: python -m pytest -q tests

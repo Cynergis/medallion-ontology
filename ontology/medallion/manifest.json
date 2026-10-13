@@ -1,0 +1,28 @@
+{
+  "name": "medallion",
+  "release": 1,
+  "domain": "data",
+  "summary": "A medallion data pipeline's batch flow: its fixed step kinds, a gate's number, a table's layer, and the rules that make a declared flow valid (order, gate placement, layer direction), checked when the flow is captured.",
+  "extends": [
+    "software-architecture",
+    "flow"
+  ],
+  "namespace": "https://cynergis.ai/ont/medallion#",
+  "engine": ">=0.11.7",
+  "carries": [
+    "vocabulary",
+    "rationale",
+    "rules",
+    "questions",
+    "sample",
+    "readme"
+  ],
+  "maintainer": "Cynergis",
+  "changelog": [
+    {
+      "release": 1,
+      "at": "2026-10-13",
+      "note": "The flow slice of the Medallion Pipeline Ontology (spec 1.2.0): the step kinds, gate and layer, and the rules of 3.8.1 and 3.8.2 that are specific to a medallion flow, on flow release 2."
+    }
+  ]
+}
