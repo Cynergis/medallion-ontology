@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline lineage</title>
+<style>
+:root {
+  --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e2e1dc;
+  --accent: #2f5d8a; --warn: #9a5b00; --warn-bg: #fff4e0;
+  --source: #6b6b66; --bronze: #9c6b30; --silver: #6f7d8c; --gold: #b08d1a;
+  --hard: #a33a2b; --soft: #7a6a2b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
+    --accent: #8db8e3; --warn: #f0b45a; --warn-bg: #3a2c14;
+    --source: #a09f98; --bronze: #d29a5a; --silver: #a9b6c4; --gold: #e0c04f;
+    --hard: #e07a6b; --soft: #d8c27a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
+  --accent: #8db8e3; --warn: #f0b45a; --warn-bg: #3a2c14;
+  --source: #a09f98; --bronze: #d29a5a; --silver: #a9b6c4; --gold: #e0c04f;
+  --hard: #e07a6b; --soft: #d8c27a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { padding: 20px 16px 12px; border-bottom: 1px solid var(--line); }
+header h1 { margin: 0; font-size: 20px; }
+header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 2px 10px; font-size: 12px; color: var(--muted); }
+.chip b { color: var(--ink); font-weight: 600; }
+main { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 110px); }
+nav { border-right: 1px solid var(--line); padding: 12px 16px; overflow-y: auto; }
+nav input { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); font: inherit; }
+nav h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 0 6px; }
+nav details { margin: 4px 0; }
+nav summary { cursor: pointer; font-weight: 600; padding: 2px 0; }
+nav ul { list-style: none; margin: 4px 0 8px; padding: 0 0 0 12px; }
+nav li a { display: block; padding: 2px 6px; border-radius: 4px; color: var(--ink); text-decoration: none; font-size: 13px; overflow-wrap: anywhere; }
+nav li a:hover { background: var(--line); }
+nav li a.on { background: var(--accent); color: var(--panel); }
+section#view { padding: 16px; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 0 0 8px; }
+.card.source { border-left-color: var(--source); } .card.bronze { border-left-color: var(--bronze); }
+.card.silver { border-left-color: var(--silver); } .card.gold { border-left-color: var(--gold); }
+.card.rule { border-left-color: var(--accent); } .card.report { border-left-color: var(--ink); }
+.card h3 { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+.card .kind { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.card .meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.card code { font-size: 12px; background: var(--bg); padding: 1px 4px; border-radius: 3px; overflow-wrap: anywhere; }
+.up { margin-left: 18px; padding-left: 12px; border-left: 1px dashed var(--line); }
+.rel { font-size: 12px; color: var(--muted); margin: 2px 0 4px; }
+.q { font-size: 12px; margin-top: 4px; }
+.q .hard { color: var(--hard); font-weight: 600; } .q .soft { color: var(--soft); font-weight: 600; }
+.gap { background: var(--warn-bg); color: var(--warn); border-radius: 6px; padding: 6px 10px; font-size: 13px; margin: 0 0 8px; }
+.empty { color: var(--muted); padding: 24px 0; }
+ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--muted); }
+@media (max-width: 760px) {
+  main { grid-template-columns: 1fr; }
+  nav { border-right: 0; border-bottom: 1px solid var(--line); max-height: 45vh; }
+  .up { margin-left: 8px; padding-left: 8px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Pipeline lineage</h1>
+  <p id="sub"></p>
+  <div class="strip" id="strip"></div>
+</header>
+<main>
+  <nav>
+    <input id="filter" type="search" placeholder="Filter fields" aria-label="Filter fields">
+    <div id="tree"></div>
+  </nav>
+  <section id="view"></section>
+</main>
+<script src="data.js"></script>
+<script>
+(function () {
+  const D = window.__LINEAGE__ || {};
+  const index = (list) => Object.fromEntries((list || []).map((x) => [x.id, x]));
+  const fields = index(D.fields), datasets = index(D.datasets), rules = index(D.rules);
+  const columns = index(D.columns), tables = index(D.tables);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const builders = {};
+  for (const x of [...(D.outputs || []), ...(D.entities || [])]) if (x.dataset && x.built_by) builders[x.dataset] = x.built_by;
+  const guards = {};
+  for (const q of D.quality || []) for (const t of q.targets || []) (guards[t] = guards[t] || []).push(q);
+
+  // header
+  const served = new Set((D.outputs || []).map((o) => o.product));
+  const products = (D.products || []).filter((p) => served.has(p.id)).map((p) => p.label).join(', ');
+  const mode = D.mode || {};
+  document.getElementById('sub').textContent =
+    (products ? products + ' · ' : '') + 'read from the knowledge base' + (mode.preview_built_at ? ', preview built ' + mode.preview_built_at : '');
+  const byLayer = (l) => (D.datasets || []).filter((d) => d.layer === l).length;
+  const gates = [1, 2, 3].map((g) => (D.quality || []).filter((q) => q.gate === g).length);
+  document.getElementById('strip').innerHTML = [
+    ['source tables', (D.tables || []).length], ['silver datasets', byLayer('silver')], ['gold datasets', byLayer('gold')],
+    ['outputs', (D.outputs || []).length], ['derivation rules', (D.rules || []).length],
+    ['quality rules at gates 1·2·3', gates.join('·')],
+  ].map(([k, v]) => '<span class="chip"><b>' + esc(v) + '</b> ' + esc(k) + '</span>').join('');
+
+  // navigation: outputs (gold), then entities (silver), each with its dataset's fields
+  function group(title, items) {
+    const blocks = items.filter((x) => x.dataset && datasets[x.dataset]).map((x) => {
+      const ids = (datasets[x.dataset].fields || []).filter((f) => fields[f]);
+      const links = ids.map((f) => '<li><a href="#' + encodeURIComponent(f) + '" data-id="' + esc(f) + '">' +
+        esc(short(fields[f].label)) + '</a></li>').join('');
+      return '<details open><summary>' + esc(x.label) + '</summary><ul>' + links + '</ul></details>';
+    }).join('');
+    return blocks ? '<h2>' + esc(title) + '</h2>' + blocks : '';
+  }
+  const short = (label) => String(label).split('.').pop();
+  const tree = document.getElementById('tree');
+  tree.innerHTML = group('Gold outputs', D.outputs || []) + group('Silver entities', D.entities || []) ||
+    '<p class="empty">No outputs or entities yet. The design-pipeline skill captures them (D4, D5).</p>';
+  document.getElementById('filter').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    tree.querySelectorAll('li').forEach((li) => { li.hidden = term && !li.textContent.toLowerCase().includes(term); });
+  });
+
+  // one value's lineage, upstream
+  function layerOf(fieldId) { const d = datasets[(fields[fieldId] || {}).dataset]; return d ? d.layer : ''; }
+  function guarded(...ids) {
+    const qs = ids.flatMap((id) => guards[id] || []);
+    return qs.length ? '<div class="q">' + qs.map((q) => '<span class="' + esc(q.severity) + '">gate ' + esc(q.gate) + ' ' +
+      esc(q.severity || '') + '</span> ' + esc(q.rule_id || q.label) + (q.assertion ? ': <code>' + esc(q.assertion) + '</code>' : '') +
+      ((q.report_checks || []).length ? ' · relied on by ' + esc(q.report_checks.join(', ')) : '')).join('<br>') + '</div>' : '';
+  }
+  function step(s) { return s ? ' · built by <b>' + esc(s.label) + '</b>' + (s.kind ? ' (' + esc(s.kind) + ')' : '') : ''; }
+  function render(id, seen) {
+    if (seen.has(id)) return '<div class="rel">(already shown above)</div>';
+    seen = new Set(seen).add(id);
+    if (fields[id]) {
+      const f = fields[id], d = datasets[f.dataset] || {}, layer = d.layer || '';
+      let html = '<div class="card ' + esc(layer) + '"><div class="kind">' + esc(layer || 'field') + ' field</div><h3>' + esc(f.label) + '</h3>' +
+        '<div class="meta">' + [f.type, f.term && 'term ' + f.term, f.required ? 'required' : null, d.label && 'in ' + d.label]
+          .filter(Boolean).map(esc).join(' · ') + step(builders[f.dataset]) + '</div>' +
+        (d.contract ? '<div class="meta">contract ' + esc(d.contract.label) + (d.contract.version && !String(d.contract.label).includes(d.contract.version) ? ' v' + esc(d.contract.version) : '') + '</div>' : '') +
+        guarded(id, f.dataset) + '</div>';
+      let up = '';
+      if (f.derived_by) up += '<div class="rel">derived by</div>' + render(f.derived_by, seen);
+      for (const s of f.fed_by || []) up += '<div class="rel">fed by</div>' + render(s, seen);
+      if (!up && layer !== 'bronze') up = '<div class="gap">No lineage yet: neither derived by a rule nor fed by a column or a field (MD9).</div>';
+      return html + (up ? '<div class="up">' + up + '</div>' : '');
+    }
+    if (rules[id]) {
+      const r = rules[id];
+      const cases = (r.edge_cases || []).map((c) => '<li>' + esc(c.case) + ': ' + esc(c.behaviour) + '</li>').join('');
+      let html = '<div class="card rule"><div class="kind">' + esc(r.kind || 'rule') + ' rule</div><h3>' + esc(r.label) + '</h3>' +
+        (r.logic ? '<div class="meta"><code>' + esc(r.logic) + '</code></div>' : '') +
+        '<div class="meta">' + [r.period_dependency, r.examples + ' example' + (r.examples === 1 ? '' : 's')].filter(Boolean).map(esc).join(' · ') + step(r.built_by) + '</div>' +
+        (cases ? '<ul class="edge">' + cases + '</ul>' : '') + '</div>';
+      if (!r.examples) html += '<div class="gap">No worked example yet (MD11).</div>';
+      const up = (r.inputs || []).map((i) => '<div class="rel">reads</div>' + render(i, seen)).join('');
+      return html + (up ? '<div class="up">' + up + '</div>' : '');
+    }
+    if (columns[id]) {
+      const c = columns[id], t = tables[c.table] || {};
+      const copy = t.copy || {};
+      return '<div class="card source"><div class="kind">source column</div><h3>' + esc(c.label) + '</h3>' +
+        '<div class="meta">' + [c.type, c.term ? 'term ' + c.term : null].filter(Boolean).map(esc).join(' · ') + '</div>' +
+        (t.label ? '<div class="meta">' + esc(t.label) + (t.system ? ' from ' + esc(t.system) : '') +
+          (t.change_behaviour ? ' · ' + esc(t.change_behaviour) : '') + (copy.method ? ' · copied by ' + esc(copy.method) : '') + step(copy.built_by) + '</div>' : '') +
+        (c.term ? '' : '<div class="gap">No business term on this column (MD5).</div>') + '</div>';
+    }
+    return '<div class="card"><h3>' + esc(id) + '</h3><div class="meta">not in this graph</div></div>';
+  }
+  function show(id) {
+    const view = document.getElementById('view');
+    tree.querySelectorAll('a.on').forEach((a) => a.classList.remove('on'));
+    const link = tree.querySelector('a[data-id="' + CSS.escape(id) + '"]');
+    if (link) link.classList.add('on');
+    if (!fields[id]) { view.innerHTML = '<p class="empty">Pick a field to see where its value comes from.</p>'; return; }
+    const shown = (fields[id].report || []).flatMap((r) => (r.shown_as || []).map((s) =>
+      '<div class="card report"><div class="kind">report field</div><h3>' + esc(s.label) + '</h3><div class="meta">' +
+      (s.report ? 'in ' + esc(s.report) + ' · ' : '') + 'column ' + esc(r.column) + '</div></div>'));
+    view.innerHTML = (shown.length ? shown.join('') + '<div class="rel">reads</div>' : '') + render(id, new Set());
+  }
+  const first = tree.querySelector('a[data-id]');
+  const pick = () => show(decodeURIComponent(location.hash.slice(1)) || (first && first.dataset.id) || '');
+  window.addEventListener('hashchange', pick);
+  pick();
+})();
+</script>
+</body>
+</html>

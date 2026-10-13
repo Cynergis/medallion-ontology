@@ -1,0 +1,1520 @@
+{
+  "_about": "What a medallion pipeline's reviewers ask: the flow (MD1, MD2), what the design still lacks (MD3 to MD17, empty when complete), and the catalogue (MD18 to MD20).",
+  "questions": {
+    "MD1": {
+      "who": "a platform lead",
+      "question": "Which steps make up each medallion flow, of which kind, in which parallel group, reading and writing which layers?",
+      "why": "The declared flow is what a reviewer approves and what the implementation agent emits; each step's kind and layers are what the medallion's rules check (spec 3.8).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "f",
+            "type": "Flow",
+            "where": {
+              "flowKind": "medallion"
+            }
+          },
+          {
+            "edge": [
+              "f",
+              "hasStep",
+              "s"
+            ]
+          },
+          {
+            "node": "s",
+            "type": "Step"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "s",
+                  "reads|writes",
+                  "a"
+                ]
+              },
+              {
+                "node": "a",
+                "type": "Artifact"
+              }
+            ]
+          }
+        ],
+        "select": [
+          "f.label",
+          "s.stepId",
+          "s.stepKind",
+          "s.parallelGroup",
+          "a.path",
+          "a.layer"
+        ]
+      },
+      "gate": "non_empty"
+    },
+    "MD2": {
+      "who": "a platform lead",
+      "question": "Which gate does each run_gate step run, and which checks does it hold, hard or soft?",
+      "why": "A gate is where a batch stops; its checks are the quality rules of that boundary (spec 3.7, 3.8.1).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "s",
+            "type": "Step",
+            "where": {
+              "stepKind": "run_gate"
+            }
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "s",
+                  "hasCheck",
+                  "c"
+                ]
+              },
+              {
+                "node": "c",
+                "type": "Check"
+              }
+            ]
+          }
+        ],
+        "select": [
+          "s.stepId",
+          "s.gate",
+          "c.checkId",
+          "c.blocking"
+        ]
+      },
+      "gate": "non_empty"
+    },
+    "MD3": {
+      "who": "a data engineer",
+      "question": "Which source tables have no evidence for how they change?",
+      "why": "A change behaviour nobody measured decides the copy policy on a guess (D2).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "t",
+            "type": "SourceTable",
+            "where": {
+              "change_behaviour_evidence": {
+                "exists": false
+              }
+            }
+          }
+        ],
+        "select": [
+          "t.label",
+          "t.change_behaviour"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD4": {
+      "who": "a data engineer",
+      "question": "Which source tables have no copy policy?",
+      "why": "A table with no copy policy never reaches bronze (D2).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "t",
+            "type": "SourceTable"
+          },
+          {
+            "not_edge": [
+              "t",
+              "copied_by",
+              "*"
+            ]
+          }
+        ],
+        "select": [
+          "t.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD5": {
+      "who": "a reference-data steward",
+      "question": "Which source columns that silver reads carry no business term?",
+      "why": "Silver is built on terms; a column with no term has no canonical meaning (D2, D3).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "c",
+            "type": "SourceColumn"
+          },
+          {
+            "edge": [
+              "f",
+              "fed_by",
+              "c"
+            ]
+          },
+          {
+            "edge": [
+              "d",
+              "has_field",
+              "f"
+            ]
+          },
+          {
+            "node": "d",
+            "type": "Dataset",
+            "where": {
+              "layer": "silver"
+            }
+          },
+          {
+            "not_edge": [
+              "c",
+              "carries_term",
+              "*"
+            ]
+          }
+        ],
+        "select": [
+          "c.label",
+          "f.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD6": {
+      "who": "a reference-data steward",
+      "question": "Which term mappings use a code map for a term that has no code set?",
+      "why": "A code map needs the list it maps into (D3).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "m",
+            "type": "TermMapping",
+            "where": {
+              "transform": {
+                "contains": "code_map"
+              }
+            }
+          },
+          {
+            "edge": [
+              "m",
+              "maps_to",
+              "t"
+            ]
+          },
+          {
+            "not_edge": [
+              "t",
+              "term_code_set",
+              "*"
+            ]
+          }
+        ],
+        "select": [
+          "m.label",
+          "t.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD7": {
+      "who": "a platform lead",
+      "question": "Which conformed entities are fed by a source table they have no identity mapping for?",
+      "why": "Every source that delivers an entity says how its id becomes the entity's key (D4).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "e",
+            "type": "ConformedEntity"
+          },
+          {
+            "edge": [
+              "e",
+              "materialised_as",
+              "d"
+            ]
+          },
+          {
+            "edge": [
+              "d",
+              "has_field",
+              "f"
+            ]
+          },
+          {
+            "edge": [
+              "f",
+              "fed_by",
+              "c"
+            ]
+          },
+          {
+            "edge": [
+              "t",
+              "has_column",
+              "c"
+            ]
+          },
+          {
+            "node": "t",
+            "type": "SourceTable"
+          },
+          {
+            "not": [
+              {
+                "edge": [
+                  "e",
+                  "has_identity_mapping",
+                  "m"
+                ]
+              },
+              {
+                "edge": [
+                  "m",
+                  "from_table",
+                  "t"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "e.label",
+          "t.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD8": {
+      "who": "a platform lead",
+      "question": "Which scope rules have no expected count?",
+      "why": "Gate 2 reconciles an entity against its expected count (D4).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "s",
+            "type": "ScopeRule",
+            "where": {
+              "expected_count": {
+                "exists": false
+              }
+            }
+          }
+        ],
+        "select": [
+          "s.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD9": {
+      "who": "an analyst",
+      "question": "Which fields of an output are neither derived by a rule nor fed by a column or a field?",
+      "why": "Every output field says where its value comes from (D5, D6).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "o",
+            "type": "Output"
+          },
+          {
+            "edge": [
+              "o",
+              "materialised_as",
+              "d"
+            ]
+          },
+          {
+            "edge": [
+              "d",
+              "has_field",
+              "f"
+            ]
+          },
+          {
+            "not_edge": [
+              "f",
+              "derived_by",
+              "*"
+            ]
+          },
+          {
+            "not_edge": [
+              "f",
+              "fed_by",
+              "*"
+            ]
+          }
+        ],
+        "select": [
+          "o.label",
+          "f.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD10": {
+      "who": "an analyst",
+      "question": "Which wide outputs do not say why they are wide?",
+      "why": "Long is the default; wide needs a reason (D5).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "o",
+            "type": "Output",
+            "where": {
+              "shape": "wide",
+              "shape_rationale": {
+                "exists": false
+              }
+            }
+          }
+        ],
+        "select": [
+          "o.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD11": {
+      "who": "an analyst",
+      "question": "Which derivation rules have no example?",
+      "why": "An example is the rule's unit test (D6, D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "r",
+            "type": "DerivationRule"
+          },
+          {
+            "not_edge": [
+              "r",
+              "has_example",
+              "*"
+            ]
+          }
+        ],
+        "select": [
+          "r.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD12": {
+      "who": "an analyst",
+      "question": "What does each derivation rule do on each edge case it answers?",
+      "why": "The five standard cases (tie, null input, missing history, younger than the lookback, duplicate input) are answered before a rule is complete; the rules flag a missing one (D6).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "r",
+            "type": "DerivationRule"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "has_edge_case",
+                  "c"
+                ]
+              },
+              {
+                "node": "c",
+                "type": "EdgeCase"
+              }
+            ]
+          }
+        ],
+        "select": [
+          "r.label",
+          "c.case",
+          "c.behaviour"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD13": {
+      "who": "a platform lead",
+      "question": "Which soft quality rules do not say why they only warn?",
+      "why": "A soft rule lets a batch through; the reason is recorded (D7).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "r",
+            "type": "QualityRule",
+            "where": {
+              "severity": "soft",
+              "severity_rationale": {
+                "exists": false
+              }
+            }
+          }
+        ],
+        "select": [
+          "r.rule_id"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD14": {
+      "who": "a platform lead",
+      "question": "Which quality rules have no row that should fail them?",
+      "why": "The failing example is the rule's forced-failure test (D7, D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "r",
+            "type": "QualityRule",
+            "where": {
+              "example_failure": {
+                "exists": false
+              }
+            }
+          }
+        ],
+        "select": [
+          "r.rule_id"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD15": {
+      "who": "a platform lead",
+      "question": "Which gate steps of a medallion flow carry out no hard quality rule?",
+      "why": "A gate with no hard rule cannot stop a batch (D7).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "f",
+            "type": "Flow",
+            "where": {
+              "flowKind": "medallion"
+            }
+          },
+          {
+            "edge": [
+              "f",
+              "hasStep",
+              "g"
+            ]
+          },
+          {
+            "node": "g",
+            "type": "Step",
+            "where": {
+              "stepKind": "run_gate"
+            }
+          },
+          {
+            "not": [
+              {
+                "edge": [
+                  "g",
+                  "hasCheck",
+                  "c"
+                ]
+              },
+              {
+                "edge": [
+                  "r",
+                  "carried_out_by",
+                  "c"
+                ]
+              },
+              {
+                "node": "r",
+                "type": "QualityRule",
+                "where": {
+                  "severity": "hard"
+                }
+              }
+            ]
+          }
+        ],
+        "select": [
+          "g.stepId",
+          "g.gate"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD16": {
+      "who": "a platform lead",
+      "question": "Which entities and outputs does no step execute?",
+      "why": "Every entity and every output is built by exactly one step of the flow (D8 Coverage).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "x",
+            "type": "ConformedEntity|Output"
+          },
+          {
+            "not_edge": [
+              "*",
+              "executes",
+              "x"
+            ]
+          }
+        ],
+        "select": [
+          "x.label",
+          "x.type"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD17": {
+      "who": "a platform lead",
+      "question": "Which source tables are copied by no step?",
+      "why": "Every source table has a copy_to_bronze step (D8 Coverage).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "t",
+            "type": "SourceTable"
+          },
+          {
+            "edge": [
+              "t",
+              "copied_by",
+              "p"
+            ]
+          },
+          {
+            "not_edge": [
+              "*",
+              "executes",
+              "p"
+            ]
+          }
+        ],
+        "select": [
+          "t.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD18": {
+      "who": "a platform lead",
+      "question": "Which identities run the pipeline or read it, in which environment, with which access?",
+      "why": "The build plan's identities; no person writes silver or gold (D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "i",
+            "type": "Identity"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "i",
+                  "in_environment",
+                  "e"
+                ]
+              },
+              {
+                "node": "e",
+                "type": "Environment"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "i",
+                  "runs_flow",
+                  "fl"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "i.label",
+          "i.identity_kind",
+          "i.access",
+          "e.label",
+          "fl.label"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD19": {
+      "who": "a platform lead",
+      "question": "Which quality rules run at which gate, through which check, failing to whom?",
+      "why": "The quality catalogue, as it runs: each rule, its gate, its check and its failure action (D7).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "r",
+            "type": "QualityRule"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "carried_out_by",
+                  "c"
+                ]
+              },
+              {
+                "node": "c",
+                "type": "Check"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "failure_action",
+                  "a"
+                ]
+              },
+              {
+                "edge": [
+                  "a",
+                  "notifies",
+                  "who"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "r.rule_id",
+          "r.gate",
+          "r.severity",
+          "c.checkId",
+          "who.label"
+        ]
+      },
+      "gate": "non_empty"
+    },
+    "MD20": {
+      "who": "an analyst",
+      "question": "Where does field $FIELD come from: the rule that derives it, or the column or field that feeds it?",
+      "why": "Lineage, one hop at a time: what a change upstream reaches downstream (D5, D6).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "$FIELD",
+            "type": "DatasetField"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "$FIELD",
+                  "derived_by",
+                  "r"
+                ]
+              },
+              {
+                "node": "r",
+                "type": "DerivationRule"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "$FIELD",
+                  "fed_by",
+                  "x"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "r.label",
+          "r.logic",
+          "x.label",
+          "x.type"
+        ]
+      },
+      "gate": "any",
+      "params": {
+        "FIELD": {
+          "type": "DatasetField"
+        }
+      }
+    },
+    "MD21": {
+      "who": "a product owner",
+      "question": "What is each data product: its period, the date that ends it, by when gold is ready, its outputs and who reads them?",
+      "why": "The product definition checkpoint (D1).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "p",
+            "type": "Product",
+            "where": {
+              "period_kind": {
+                "exists": true
+              }
+            }
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "o",
+                  "output_of",
+                  "p"
+                ]
+              },
+              {
+                "node": "o",
+                "type": "Output"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "who",
+                  "reads_output",
+                  "o"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "p.label",
+          "p.period_kind",
+          "p.period_end_rule",
+          "p.freshness_sla",
+          "o.label",
+          "who.label"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD22": {
+      "who": "a source owner",
+      "question": "Which source tables does each source system deliver, read how, keyed on what, changing how, copied how?",
+      "why": "The source contracts checkpoint (D2).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "s",
+            "type": "SourceSystem"
+          },
+          {
+            "edge": [
+              "t",
+              "delivered_by",
+              "s"
+            ]
+          },
+          {
+            "node": "t",
+            "type": "SourceTable"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "t",
+                  "copied_by",
+                  "p"
+                ]
+              },
+              {
+                "node": "p",
+                "type": "CopyPolicy"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "p",
+                  "watermark",
+                  "w"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "t",
+                  "date_column",
+                  "dc"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "t",
+                  "has_key",
+                  "k"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "t",
+                  "stewarded_by",
+                  "who"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "t",
+                  "has_column",
+                  "c"
+                ]
+              },
+              {
+                "node": "c",
+                "type": "SourceColumn"
+              }
+            ]
+          }
+        ],
+        "select": [
+          "s.label",
+          "s.source_kind",
+          "s.access_method",
+          "s.source_side_logic_allowed",
+          "t.schema",
+          "t.table_name",
+          "t.change_behaviour",
+          "t.change_behaviour_evidence",
+          "t.expected_at_period_end",
+          "t.delivery_lag",
+          "dc.label",
+          "k.label",
+          "who.label",
+          "p.method",
+          "p.lookback",
+          "p.source_side_filter",
+          "p.retention_hot",
+          "p.retention_cold",
+          "w.label",
+          "c.column_name",
+          "c.source_type",
+          "c.nullable",
+          "c.unit",
+          "c.sample_values"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD23": {
+      "who": "a reference-data steward",
+      "question": "Which term does each mapped source column carry, through which transform, and which code sets map which source values?",
+      "why": "The reference data checkpoint (D3).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "m",
+            "type": "TermMapping"
+          },
+          {
+            "edge": [
+              "m",
+              "maps_column",
+              "c"
+            ]
+          },
+          {
+            "edge": [
+              "m",
+              "maps_to",
+              "t"
+            ]
+          },
+          {
+            "node": "t",
+            "type": "Term"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "t",
+                  "term_code_set",
+                  "cs"
+                ]
+              },
+              {
+                "node": "cs",
+                "type": "CodeSet"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "cm",
+                  "of_code_set",
+                  "cs"
+                ]
+              },
+              {
+                "node": "cm",
+                "type": "CodeMapping"
+              },
+              {
+                "edge": [
+                  "cm",
+                  "from_system",
+                  "s"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "c.label",
+          "m.transform",
+          "t.label",
+          "t.data_type",
+          "t.unit",
+          "cs.values",
+          "cs.labels",
+          "cm.source_value",
+          "cm.canonical_value",
+          "s.label"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD24": {
+      "who": "a platform lead",
+      "question": "How is each conformed entity resolved: its dataset and grain, each source's identity mapping, its scope and tolerance, its history?",
+      "why": "The entity design checkpoint (D4).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "e",
+            "type": "ConformedEntity"
+          },
+          {
+            "edge": [
+              "e",
+              "materialised_as",
+              "d"
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "e",
+                  "has_identity_mapping",
+                  "m"
+                ]
+              },
+              {
+                "node": "m",
+                "type": "IdentityMapping"
+              },
+              {
+                "edge": [
+                  "m",
+                  "from_table",
+                  "t"
+                ]
+              },
+              {
+                "edge": [
+                  "m",
+                  "id_column",
+                  "ic"
+                ]
+              },
+              {
+                "edge": [
+                  "m",
+                  "target_key",
+                  "tk"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "e",
+                  "scoped_by",
+                  "s"
+                ]
+              },
+              {
+                "node": "s",
+                "type": "ScopeRule"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "s",
+                  "within_tolerance",
+                  "tol"
+                ]
+              },
+              {
+                "node": "tol",
+                "type": "Tolerance"
+              },
+              {
+                "edge": [
+                  "tol",
+                  "set_by",
+                  "by"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "e",
+                  "keeps_history",
+                  "h"
+                ]
+              },
+              {
+                "node": "h",
+                "type": "HistoryPolicy"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "e",
+                  "grain",
+                  "g"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "e.label",
+          "d.label",
+          "g.label",
+          "t.label",
+          "ic.label",
+          "m.transform",
+          "m.company_or_tenant_map",
+          "tk.label",
+          "s.conditions",
+          "s.expected_count",
+          "s.count_as_of",
+          "s.count_source",
+          "tol.value",
+          "tol.tolerance_unit",
+          "tol.rationale",
+          "by.label",
+          "h.history_kind",
+          "h.valid_from_rule",
+          "h.valid_to_rule"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD25": {
+      "who": "an analyst",
+      "question": "What does each output promise: its dataset, layer and fields, the entity it joins, its contract's version, keys and change policy?",
+      "why": "The output contract checkpoint (D5).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "o",
+            "type": "Output"
+          },
+          {
+            "edge": [
+              "o",
+              "materialised_as",
+              "d"
+            ]
+          },
+          {
+            "node": "d",
+            "type": "Dataset"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "o",
+                  "joins_to",
+                  "e"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "d",
+                  "has_field",
+                  "f"
+                ]
+              },
+              {
+                "node": "f",
+                "type": "DatasetField"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "f",
+                  "bound_to",
+                  "cs"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "k",
+                  "contract_of",
+                  "d"
+                ]
+              },
+              {
+                "node": "k",
+                "type": "DataContract"
+              }
+            ]
+          }
+        ],
+        "select": [
+          "o.label",
+          "o.shape",
+          "o.shape_rationale",
+          "o.period_dependency",
+          "o.lookback",
+          "o.needs_history",
+          "e.label",
+          "d.label",
+          "d.layer",
+          "d.dataset_kind",
+          "d.partition_by",
+          "d.cluster_by",
+          "f.label",
+          "f.data_type",
+          "f.required",
+          "cs.label",
+          "k.version",
+          "k.contract_fields",
+          "k.keys",
+          "k.change_policy"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD26": {
+      "who": "an analyst",
+      "question": "How is each derivation rule defined: its kind, logic, inputs, period dependency, the field it derives and its example?",
+      "why": "The field mapping checkpoint (D6).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "r",
+            "type": "DerivationRule"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "f",
+                  "derived_by",
+                  "r"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "rule_input",
+                  "i"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "has_example",
+                  "x"
+                ]
+              },
+              {
+                "node": "x",
+                "type": "RuleExample"
+              }
+            ]
+          }
+        ],
+        "select": [
+          "r.label",
+          "r.rule_kind",
+          "r.logic",
+          "r.reviewed_by",
+          "r.period_dependency",
+          "r.lookback",
+          "r.specified_in",
+          "f.label",
+          "i.label",
+          "x.inputs",
+          "x.expected_output",
+          "x.computed_by"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD27": {
+      "who": "a platform lead",
+      "question": "What does each quality rule check, how, with which tolerance, and what happens when it fails?",
+      "why": "The quality catalogue checkpoint (D7).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "r",
+            "type": "QualityRule"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "targets",
+                  "t"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "within_tolerance",
+                  "tol"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "failure_action",
+                  "a"
+                ]
+              },
+              {
+                "node": "a",
+                "type": "FailureAction"
+              },
+              {
+                "edge": [
+                  "a",
+                  "follows_runbook",
+                  "rb"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "r",
+                  "stewarded_by",
+                  "who"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "r.rule_id",
+          "r.gate",
+          "r.assertion",
+          "r.severity",
+          "r.severity_rationale",
+          "r.example_failure",
+          "r.specified_in",
+          "t.label",
+          "tol.label",
+          "a.auto_retry",
+          "a.max_retries",
+          "rb.label",
+          "who.label"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD28": {
+      "who": "a platform lead",
+      "question": "What does each step of a medallion flow execute in the design, and which design table does each artifact it writes represent?",
+      "why": "The flow, tied to the design (D8): coverage and the single executor are read from it.",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "f",
+            "type": "Flow",
+            "where": {
+              "flowKind": "medallion"
+            }
+          },
+          {
+            "edge": [
+              "f",
+              "hasStep",
+              "s"
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "s",
+                  "executes",
+                  "x"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "s",
+                  "writes",
+                  "a"
+                ]
+              },
+              {
+                "edge": [
+                  "a",
+                  "represents",
+                  "d"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "s.stepId",
+          "s.stepKind",
+          "x.label",
+          "x.type",
+          "d.label"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD29": {
+      "who": "a platform lead",
+      "question": "Which runbooks resume a failed flow from which step?",
+      "why": "A recovery names an existing step, so it stays true when the flow changes (D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "rb",
+            "type": "Runbook"
+          },
+          {
+            "edge": [
+              "rb",
+              "resumes_from",
+              "s"
+            ]
+          },
+          {
+            "node": "s",
+            "type": "Step"
+          }
+        ],
+        "select": [
+          "rb.label",
+          "s.stepId"
+        ]
+      },
+      "gate": "any"
+    }
+  }
+}

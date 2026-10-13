@@ -1,0 +1,37 @@
+{
+ "name": "lineage",
+ "summary": "Where each value of a medallion pipeline comes from: a gold field back through its rule or the silver field that feeds it to the source column, with the step that builds each and the quality rules that guard it; and, when the report-medallion bridge is in the project, the report fields that show it.",
+ "entry": "index.html",
+ "engine": ">=0.11.6",
+ "data": [
+  {
+   "file": "data.js",
+   "format": "js-globals",
+   "globals": {
+    "__LINEAGE__": {
+     "$include": "projections/lineage.json"
+    }
+   }
+  }
+ ],
+ "requires": {
+  "classes": [
+   "Output",
+   "Dataset",
+   "DatasetField",
+   "DerivationRule",
+   "SourceColumn",
+   "SourceTable",
+   "QualityRule"
+  ],
+  "relations": [
+   "materialised_as",
+   "has_field",
+   "derived_by",
+   "fed_by",
+   "rule_input",
+   "has_column",
+   "targets"
+  ]
+ }
+}

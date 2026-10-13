@@ -1,0 +1,38 @@
+{
+  "name": "medallion",
+  "release": 2,
+  "domain": "data",
+  "summary": "A medallion data pipeline, source systems to bronze, silver and gold: its sources, reference data, conformed entities, gold outputs and contracts, derivation and quality rules, build plan, and the batch flow that executes them, with the rules a design and a declared flow must satisfy.",
+  "extends": [
+    "software-architecture",
+    "flow"
+  ],
+  "namespace": "https://cynergis.ai/ont/medallion#",
+  "engine": ">=0.11.7",
+  "carries": [
+    "vocabulary",
+    "rationale",
+    "rules",
+    "questions",
+    "sample",
+    "readme"
+  ],
+  "maintainer": "Cynergis",
+  "changelog": [
+    {
+      "release": 2,
+      "at": "2026-10-13",
+      "note": "The design slice (spec 1.2.0, D1 to D7 and D9): sources, reference data, conformed entities, datasets, outputs and data contracts, derivation and quality rules, identities; a flow step executes the design; correctness as blocking rules, completeness as questions that must come back empty. Names per DECISIONS.md."
+    },
+    {
+      "release": 1,
+      "at": "2026-10-13",
+      "note": "The flow slice of the Medallion Pipeline Ontology (spec 1.2.0): the step kinds, gate and layer, and the rules of 3.8.1 and 3.8.2 that are specific to a medallion flow, on flow release 2."
+    }
+  ],
+  "source": "https://github.com/Cynergis/medallion-ontology",
+  "path": "ontology/medallion",
+  "commit": "17382e8",
+  "fetched_at": "2026-10-13T15:28:09+00:00",
+  "_about": "The ontology's identity: its release rises on every published change, `extends` names what it composes on top of, `carries` what the directory holds."
+}

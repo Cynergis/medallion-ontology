@@ -1,0 +1,4997 @@
+{
+  "_about": "The specification's worked instance (section 7), whole: the fund-profile data product, its two sources, the fund and fund-holding entities, two gold outputs and a contract, the top-10 rule, a hard quality rule at each gate, and the flow that executes them. Neutral source names. Replace it.",
+  "nodes": [
+    {
+      "id": "flow.fund-profile",
+      "type": "Flow",
+      "label": "Fund profile batch",
+      "summary": "Fund profile batch",
+      "attributes": {
+        "flowKind": "medallion",
+        "trigger": "on_sources_ready",
+        "resumable": true,
+        "value": "1"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "Fund profile batch"
+        }
+      ]
+    },
+    {
+      "id": "artifact.src-fund-holding",
+      "type": "Artifact",
+      "label": "source.fund_holding",
+      "summary": "source.fund_holding",
+      "attributes": {
+        "path": "source.fund_holding",
+        "format": "table",
+        "layer": "source",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source.fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "artifact.src-dim-product",
+      "type": "Artifact",
+      "label": "source.dim_product",
+      "summary": "source.dim_product",
+      "attributes": {
+        "path": "source.dim_product",
+        "format": "table",
+        "layer": "source",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source.dim_product"
+        }
+      ]
+    },
+    {
+      "id": "artifact.control-batch",
+      "type": "Artifact",
+      "label": "control.batch",
+      "summary": "control.batch",
+      "attributes": {
+        "path": "control.batch",
+        "format": "table",
+        "layer": "control",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "control.batch"
+        }
+      ]
+    },
+    {
+      "id": "artifact.bronze-fund-holding",
+      "type": "Artifact",
+      "label": "bronze.source__fund_holding",
+      "summary": "bronze.source__fund_holding",
+      "attributes": {
+        "path": "bronze.source__fund_holding",
+        "format": "table",
+        "layer": "bronze",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "bronze.source__fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "artifact.bronze-dim-product",
+      "type": "Artifact",
+      "label": "bronze.source__dim_product",
+      "summary": "bronze.source__dim_product",
+      "attributes": {
+        "path": "bronze.source__dim_product",
+        "format": "table",
+        "layer": "bronze",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "bronze.source__dim_product"
+        }
+      ]
+    },
+    {
+      "id": "artifact.silver-fund",
+      "type": "Artifact",
+      "label": "silver.fund",
+      "summary": "silver.fund",
+      "attributes": {
+        "path": "silver.fund",
+        "format": "table",
+        "layer": "silver",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund"
+        }
+      ]
+    },
+    {
+      "id": "artifact.silver-fund-holding",
+      "type": "Artifact",
+      "label": "silver.fund_holding",
+      "summary": "silver.fund_holding",
+      "attributes": {
+        "path": "silver.fund_holding",
+        "format": "table",
+        "layer": "silver",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "artifact.gold-portfolio-holdings",
+      "type": "Artifact",
+      "label": "gold.portfolio_holdings",
+      "summary": "gold.portfolio_holdings",
+      "attributes": {
+        "path": "gold.portfolio_holdings",
+        "format": "table",
+        "layer": "gold",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_holdings"
+        }
+      ]
+    },
+    {
+      "id": "artifact.gold-portfolio-allocations",
+      "type": "Artifact",
+      "label": "gold.portfolio_allocations",
+      "summary": "gold.portfolio_allocations",
+      "attributes": {
+        "path": "gold.portfolio_allocations",
+        "format": "table",
+        "layer": "gold",
+        "carries": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_allocations"
+        }
+      ]
+    },
+    {
+      "id": "param.pct-tolerance",
+      "type": "ConfigParameter",
+      "label": "pct_tolerance",
+      "summary": "pct_tolerance",
+      "attributes": {
+        "paramName": "pct_tolerance",
+        "value": "0.5"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "pct_tolerance"
+        }
+      ]
+    },
+    {
+      "id": "metric.allocation-sum",
+      "type": "Metric",
+      "label": "allocation_sum",
+      "summary": "allocation_sum",
+      "attributes": {
+        "metricName": "allocation_sum"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "allocation_sum"
+        }
+      ]
+    },
+    {
+      "id": "outcome.pass",
+      "type": "Outcome",
+      "label": "pass",
+      "summary": "pass",
+      "attributes": {
+        "outcomeName": "pass"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "pass"
+        }
+      ]
+    },
+    {
+      "id": "outcome.fail",
+      "type": "Outcome",
+      "label": "fail",
+      "summary": "fail",
+      "attributes": {
+        "outcomeName": "fail"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fail"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-01",
+      "type": "DeterministicStep",
+      "label": "fp-01",
+      "summary": "fp-01",
+      "attributes": {
+        "stepId": "fp-01",
+        "stepKind": "create_batch",
+        "command": "<binding> create-batch --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-01"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-02",
+      "type": "DeterministicStep",
+      "label": "fp-02",
+      "summary": "fp-02",
+      "attributes": {
+        "stepId": "fp-02",
+        "stepKind": "check_sources_ready",
+        "command": "<binding> check-sources-ready --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-02"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-03",
+      "type": "DeterministicStep",
+      "label": "fp-03",
+      "summary": "fp-03",
+      "attributes": {
+        "stepId": "fp-03",
+        "stepKind": "copy_to_bronze",
+        "parallelGroup": "copy",
+        "command": "<binding> copy-fund-holding --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-03"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-04",
+      "type": "DeterministicStep",
+      "label": "fp-04",
+      "summary": "fp-04",
+      "attributes": {
+        "stepId": "fp-04",
+        "stepKind": "copy_to_bronze",
+        "parallelGroup": "copy",
+        "command": "<binding> copy-dim-product --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-04"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-05",
+      "type": "DeterministicStep",
+      "label": "fp-05",
+      "summary": "fp-05",
+      "attributes": {
+        "stepId": "fp-05",
+        "stepKind": "run_gate",
+        "gate": 1,
+        "command": "<binding> gate 1 --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-05"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-06",
+      "type": "DeterministicStep",
+      "label": "fp-06",
+      "summary": "fp-06",
+      "attributes": {
+        "stepId": "fp-06",
+        "stepKind": "build_entity",
+        "command": "<binding> build-fund --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-06"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-07",
+      "type": "DeterministicStep",
+      "label": "fp-07",
+      "summary": "fp-07",
+      "attributes": {
+        "stepId": "fp-07",
+        "stepKind": "build_entity",
+        "command": "<binding> build-fund-holding --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-07"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-08",
+      "type": "DeterministicStep",
+      "label": "fp-08",
+      "summary": "fp-08",
+      "attributes": {
+        "stepId": "fp-08",
+        "stepKind": "run_gate",
+        "gate": 2,
+        "command": "<binding> gate 2 --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-08"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-09",
+      "type": "DeterministicStep",
+      "label": "fp-09",
+      "summary": "fp-09",
+      "attributes": {
+        "stepId": "fp-09",
+        "stepKind": "build_output",
+        "parallelGroup": "gold",
+        "command": "<binding> build-portfolio-holdings --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-09"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-09b",
+      "type": "DeterministicStep",
+      "label": "fp-09b",
+      "summary": "fp-09b",
+      "attributes": {
+        "stepId": "fp-09b",
+        "stepKind": "build_output",
+        "parallelGroup": "gold",
+        "command": "<binding> build-portfolio-allocations --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-09b"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-10",
+      "type": "DeterministicStep",
+      "label": "fp-10",
+      "summary": "fp-10",
+      "attributes": {
+        "stepId": "fp-10",
+        "stepKind": "run_gate",
+        "gate": 3,
+        "command": "<binding> gate 3 --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-10"
+        }
+      ]
+    },
+    {
+      "id": "step.fp-11",
+      "type": "DeterministicStep",
+      "label": "fp-11",
+      "summary": "fp-11",
+      "attributes": {
+        "stepId": "fp-11",
+        "stepKind": "mark_validated",
+        "command": "<binding> mark-validated --batch {batch_id} --period-end {period_end}"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-11"
+        }
+      ]
+    },
+    {
+      "id": "param.expected-fund-count",
+      "type": "ConfigParameter",
+      "label": "expected_fund_count",
+      "summary": "expected_fund_count",
+      "attributes": {
+        "paramName": "expected_fund_count",
+        "value": "103"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "expected_fund_count"
+        }
+      ]
+    },
+    {
+      "id": "metric.fund-count",
+      "type": "Metric",
+      "label": "fund_count",
+      "summary": "fund_count",
+      "attributes": {
+        "metricName": "fund_count"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund_count"
+        }
+      ]
+    },
+    {
+      "id": "invariant.idempotent",
+      "type": "Invariant",
+      "label": "idempotent",
+      "summary": "idempotent",
+      "attributes": {
+        "statement": "A step re-run for the same batch and period end writes the same rows.",
+        "concerns": [
+          "DataStore"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "idempotent"
+        }
+      ]
+    },
+    {
+      "id": "check.no-active-batch",
+      "type": "Check",
+      "label": "no batch is active for the period",
+      "summary": "no batch is active for the period",
+      "attributes": {
+        "checkId": "no-active-batch",
+        "checkKind": "control",
+        "expression": "count(control.batch where state = active) == 0",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "no batch is active for the period"
+        }
+      ]
+    },
+    {
+      "id": "check.sources-present-for-period",
+      "type": "Check",
+      "label": "every expected source has rows for the period end",
+      "summary": "every expected source has rows for the period end",
+      "attributes": {
+        "checkId": "sources-present-for-period",
+        "checkKind": "control",
+        "expression": "present_for_period(source.fund_holding) and present_for_period(source.dim_product)",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "every expected source has rows for the period end"
+        }
+      ]
+    },
+    {
+      "id": "check.fp-03-rerun",
+      "type": "Check",
+      "label": "fp-03 writes the same rows when re-run",
+      "summary": "fp-03 writes the same rows when re-run",
+      "attributes": {
+        "checkId": "fp-03-rerun",
+        "checkKind": "rerun",
+        "expression": "rows(rerun(batch_id)) == rows(batch_id)",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-03 writes the same rows when re-run"
+        }
+      ]
+    },
+    {
+      "id": "check.fp-04-rerun",
+      "type": "Check",
+      "label": "fp-04 writes the same rows when re-run",
+      "summary": "fp-04 writes the same rows when re-run",
+      "attributes": {
+        "checkId": "fp-04-rerun",
+        "checkKind": "rerun",
+        "expression": "rows(rerun(batch_id)) == rows(batch_id)",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-04 writes the same rows when re-run"
+        }
+      ]
+    },
+    {
+      "id": "check.fp-06-rerun",
+      "type": "Check",
+      "label": "fp-06 writes the same rows when re-run",
+      "summary": "fp-06 writes the same rows when re-run",
+      "attributes": {
+        "checkId": "fp-06-rerun",
+        "checkKind": "rerun",
+        "expression": "rows(rerun(batch_id)) == rows(batch_id)",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-06 writes the same rows when re-run"
+        }
+      ]
+    },
+    {
+      "id": "check.fp-07-rerun",
+      "type": "Check",
+      "label": "fp-07 writes the same rows when re-run",
+      "summary": "fp-07 writes the same rows when re-run",
+      "attributes": {
+        "checkId": "fp-07-rerun",
+        "checkKind": "rerun",
+        "expression": "rows(rerun(batch_id)) == rows(batch_id)",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-07 writes the same rows when re-run"
+        }
+      ]
+    },
+    {
+      "id": "check.fp-09-rerun",
+      "type": "Check",
+      "label": "fp-09 writes the same rows when re-run",
+      "summary": "fp-09 writes the same rows when re-run",
+      "attributes": {
+        "checkId": "fp-09-rerun",
+        "checkKind": "rerun",
+        "expression": "rows(rerun(batch_id)) == rows(batch_id)",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-09 writes the same rows when re-run"
+        }
+      ]
+    },
+    {
+      "id": "check.fp-09b-rerun",
+      "type": "Check",
+      "label": "fp-09b writes the same rows when re-run",
+      "summary": "fp-09b writes the same rows when re-run",
+      "attributes": {
+        "checkId": "fp-09b-rerun",
+        "checkKind": "rerun",
+        "expression": "rows(rerun(batch_id)) == rows(batch_id)",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fp-09b writes the same rows when re-run"
+        }
+      ]
+    },
+    {
+      "id": "check.bronze-keys-unique",
+      "type": "Check",
+      "label": "bronze keys are unique",
+      "summary": "bronze keys are unique",
+      "attributes": {
+        "checkId": "bronze-keys-unique",
+        "checkKind": "gate1",
+        "expression": "unique(bronze.source__fund_holding, [fund_id, holding_name, effective_date])",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "bronze keys are unique"
+        }
+      ]
+    },
+    {
+      "id": "check.fund-count-equals-expected",
+      "type": "Check",
+      "label": "silver fund count equals the expected count",
+      "summary": "silver fund count equals the expected count",
+      "attributes": {
+        "checkId": "fund-count-equals-expected",
+        "checkKind": "gate2",
+        "expression": "count(silver.fund) == expected_fund_count",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver fund count equals the expected count"
+        }
+      ]
+    },
+    {
+      "id": "check.allocations-sum-100",
+      "type": "Check",
+      "label": "allocations sum to 100",
+      "summary": "allocations sum to 100",
+      "attributes": {
+        "checkId": "allocations-sum-100",
+        "checkKind": "gate3",
+        "expression": "abs(sum(allocation_pct) - 100) <= pct_tolerance",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "allocations sum to 100"
+        }
+      ]
+    },
+    {
+      "id": "check.all-gates-passed",
+      "type": "Check",
+      "label": "every gate of the batch passed",
+      "summary": "every gate of the batch passed",
+      "attributes": {
+        "checkId": "all-gates-passed",
+        "checkKind": "control",
+        "expression": "state(gate 1) == state(gate 2) == state(gate 3) == passed",
+        "blocking": "hard"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "every gate of the batch passed"
+        }
+      ]
+    },
+    {
+      "id": "product.fund-profile",
+      "type": "Product",
+      "label": "Fund profile",
+      "summary": "Fund profile",
+      "attributes": {
+        "stage": "building",
+        "domain": "reporting",
+        "period_kind": "monthly",
+        "period_end_rule": "calendar_month_end",
+        "freshness_sla": "2 business days"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "Fund profile"
+        }
+      ]
+    },
+    {
+      "id": "role.product-owner",
+      "type": "Role",
+      "label": "product owner",
+      "summary": "product owner",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "product owner"
+        }
+      ]
+    },
+    {
+      "id": "role.platform-lead",
+      "type": "Role",
+      "label": "platform lead",
+      "summary": "platform lead",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "platform lead"
+        }
+      ]
+    },
+    {
+      "id": "role.data-owner",
+      "type": "Role",
+      "label": "source data owner",
+      "summary": "source data owner",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source data owner"
+        }
+      ]
+    },
+    {
+      "id": "role.reference-steward",
+      "type": "Role",
+      "label": "reference-data steward",
+      "summary": "reference-data steward",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "reference-data steward"
+        }
+      ]
+    },
+    {
+      "id": "role.analyst",
+      "type": "Role",
+      "label": "analyst",
+      "summary": "analyst",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "analyst"
+        }
+      ]
+    },
+    {
+      "id": "system.bi-fund-pages",
+      "type": "System",
+      "label": "BI fund pages",
+      "summary": "BI fund pages",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "BI fund pages"
+        }
+      ]
+    },
+    {
+      "id": "environment.prod",
+      "type": "Environment",
+      "label": "prod",
+      "summary": "prod",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "prod"
+        }
+      ]
+    },
+    {
+      "id": "valueproposition.trusted-fact-sheets",
+      "type": "ValueProposition",
+      "label": "monthly fact sheets an adviser can trust, two business days after month end",
+      "summary": "monthly fact sheets an adviser can trust, two business days after month end",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "monthly fact sheets an adviser can trust, two business days after month end"
+        }
+      ]
+    },
+    {
+      "id": "successcriterion.gold-on-time",
+      "type": "SuccessCriterion",
+      "label": "gold is ready on time every month",
+      "summary": "gold is ready on time every month",
+      "attributes": {
+        "metric": "months gold was ready within the freshness SLA, of the last twelve",
+        "target": "12 of 12"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold is ready on time every month"
+        }
+      ]
+    },
+    {
+      "id": "capability.fund-reporting",
+      "type": "Capability",
+      "label": "fund reporting",
+      "summary": "fund reporting",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund reporting"
+        }
+      ]
+    },
+    {
+      "id": "system.fund-profile-pipeline",
+      "type": "System",
+      "label": "fund profile pipeline",
+      "summary": "fund profile pipeline",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund profile pipeline"
+        }
+      ]
+    },
+    {
+      "id": "component.source-database",
+      "type": "Component",
+      "label": "source database",
+      "summary": "source database",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source database"
+        }
+      ]
+    },
+    {
+      "id": "component.fund-pages",
+      "type": "Component",
+      "label": "fund pages",
+      "summary": "fund pages",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund pages"
+        }
+      ]
+    },
+    {
+      "id": "component.batch-jobs",
+      "type": "Component",
+      "label": "batch jobs",
+      "summary": "batch jobs",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "batch jobs"
+        }
+      ]
+    },
+    {
+      "id": "runbook.hard-gate-failure",
+      "type": "Runbook",
+      "label": "Hard gate failure",
+      "summary": "Hard gate failure",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "Hard gate failure"
+        }
+      ]
+    },
+    {
+      "id": "sourcesystem.source",
+      "type": "SourceSystem",
+      "label": "source",
+      "summary": "source",
+      "attributes": {
+        "source_kind": "rdbms",
+        "access_method": "direct_query",
+        "source_side_logic_allowed": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source"
+        }
+      ]
+    },
+    {
+      "id": "sourcetable.fund-holding",
+      "type": "SourceTable",
+      "label": "source.fund_holding",
+      "summary": "source.fund_holding",
+      "attributes": {
+        "schema": "source",
+        "table_name": "fund_holding",
+        "change_behaviour": "manual_reload",
+        "change_behaviour_evidence": "drift probe 2026-09: the Sept-30 slice changed on Oct 8",
+        "expected_at_period_end": true,
+        "delivery_lag": "3 business days"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source.fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "copypolicy.fund-holding",
+      "type": "CopyPolicy",
+      "label": "copy fund_holding",
+      "summary": "copy fund_holding",
+      "attributes": {
+        "method": "full_period_slice",
+        "lookback": "1 month",
+        "source_side_filter": "date_between(period_end - lookback, period_end)",
+        "retention_hot": "13 months",
+        "retention_cold": "7 years"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "copy fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "sourcetable.dim-product",
+      "type": "SourceTable",
+      "label": "source.dim_product",
+      "summary": "source.dim_product",
+      "attributes": {
+        "schema": "source",
+        "table_name": "dim_product",
+        "change_behaviour": "overwritten",
+        "change_behaviour_evidence": "owner statement 2026-10-13",
+        "expected_at_period_end": true,
+        "delivery_lag": "1 business day"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source.dim_product"
+        }
+      ]
+    },
+    {
+      "id": "copypolicy.dim-product",
+      "type": "CopyPolicy",
+      "label": "copy dim_product",
+      "summary": "copy dim_product",
+      "attributes": {
+        "method": "full_period_slice",
+        "lookback": "1 month",
+        "source_side_filter": "date_between(period_end - lookback, period_end)",
+        "retention_hot": "13 months",
+        "retention_cold": "7 years"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "copy dim_product"
+        }
+      ]
+    },
+    {
+      "id": "sourcecolumn.fund-holding.fund_id",
+      "type": "SourceColumn",
+      "label": "fund_holding.fund_id",
+      "summary": "fund_holding.fund_id",
+      "attributes": {
+        "column_name": "fund_id",
+        "source_type": "varchar",
+        "nullable": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund_holding.fund_id"
+        }
+      ]
+    },
+    {
+      "id": "sourcecolumn.fund-holding.holding_name",
+      "type": "SourceColumn",
+      "label": "fund_holding.holding_name",
+      "summary": "fund_holding.holding_name",
+      "attributes": {
+        "column_name": "holding_name",
+        "source_type": "varchar",
+        "nullable": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund_holding.holding_name"
+        }
+      ]
+    },
+    {
+      "id": "sourcecolumn.fund-holding.effective_date",
+      "type": "SourceColumn",
+      "label": "fund_holding.effective_date",
+      "summary": "fund_holding.effective_date",
+      "attributes": {
+        "column_name": "effective_date",
+        "source_type": "date",
+        "nullable": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund_holding.effective_date"
+        }
+      ]
+    },
+    {
+      "id": "sourcecolumn.fund-holding.holding_pct",
+      "type": "SourceColumn",
+      "label": "fund_holding.holding_pct",
+      "summary": "fund_holding.holding_pct",
+      "attributes": {
+        "column_name": "holding_pct",
+        "source_type": "decimal",
+        "nullable": true,
+        "unit": "percent"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund_holding.holding_pct"
+        }
+      ]
+    },
+    {
+      "id": "sourcecolumn.fund-holding.language_code",
+      "type": "SourceColumn",
+      "label": "fund_holding.language_code",
+      "summary": "fund_holding.language_code",
+      "attributes": {
+        "column_name": "language_code",
+        "source_type": "char(2)",
+        "nullable": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund_holding.language_code"
+        }
+      ]
+    },
+    {
+      "id": "sourcecolumn.dim-product.prod_cr_id",
+      "type": "SourceColumn",
+      "label": "dim_product.prod_cr_id",
+      "summary": "dim_product.prod_cr_id",
+      "attributes": {
+        "column_name": "prod_cr_id",
+        "source_type": "integer",
+        "nullable": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "dim_product.prod_cr_id"
+        }
+      ]
+    },
+    {
+      "id": "sourcecolumn.dim-product.state",
+      "type": "SourceColumn",
+      "label": "dim_product.state",
+      "summary": "dim_product.state",
+      "attributes": {
+        "column_name": "state",
+        "source_type": "varchar",
+        "nullable": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "dim_product.state"
+        }
+      ]
+    },
+    {
+      "id": "term.fund-id",
+      "type": "Term",
+      "label": "fund id",
+      "summary": "fund id",
+      "attributes": {
+        "data_type": "char(5)",
+        "definition": "The fund id."
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund id"
+        }
+      ]
+    },
+    {
+      "id": "term.holding-weight",
+      "type": "Term",
+      "label": "holding weight",
+      "summary": "holding weight",
+      "attributes": {
+        "data_type": "decimal",
+        "unit": "percent",
+        "definition": "The holding weight."
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holding weight"
+        }
+      ]
+    },
+    {
+      "id": "term.fund-state",
+      "type": "Term",
+      "label": "fund state",
+      "summary": "fund state",
+      "attributes": {
+        "data_type": "varchar",
+        "definition": "The fund state."
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund state"
+        }
+      ]
+    },
+    {
+      "id": "term.holding-name",
+      "type": "Term",
+      "label": "holding name",
+      "summary": "holding name",
+      "attributes": {
+        "data_type": "varchar",
+        "definition": "The holding name."
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holding name"
+        }
+      ]
+    },
+    {
+      "id": "term.language",
+      "type": "Term",
+      "label": "language",
+      "summary": "language",
+      "attributes": {
+        "data_type": "char(2)",
+        "definition": "The language."
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "language"
+        }
+      ]
+    },
+    {
+      "id": "codeset.fund-state",
+      "type": "CodeSet",
+      "label": "fund state",
+      "summary": "fund state",
+      "attributes": {
+        "values": [
+          "OPEN",
+          "CLOSED"
+        ],
+        "labels": [
+          "OPEN@en: Open",
+          "OPEN@fr: Ouvert",
+          "CLOSED@en: Closed",
+          "CLOSED@fr: Fermé"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund state"
+        }
+      ]
+    },
+    {
+      "id": "codemapping.source-a",
+      "type": "CodeMapping",
+      "label": "source A is OPEN",
+      "summary": "source A is OPEN",
+      "attributes": {
+        "source_value": "A",
+        "canonical_value": "OPEN"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source A is OPEN"
+        }
+      ]
+    },
+    {
+      "id": "codemapping.source-c",
+      "type": "CodeMapping",
+      "label": "source C is CLOSED",
+      "summary": "source C is CLOSED",
+      "attributes": {
+        "source_value": "C",
+        "canonical_value": "CLOSED"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "source C is CLOSED"
+        }
+      ]
+    },
+    {
+      "id": "termmapping.holding-pct",
+      "type": "TermMapping",
+      "label": "fund-holding.holding_pct is holding-weight",
+      "summary": "fund-holding.holding_pct is holding-weight",
+      "attributes": {
+        "transform": "identity"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund-holding.holding_pct is holding-weight"
+        }
+      ]
+    },
+    {
+      "id": "termmapping.prod-cr-id",
+      "type": "TermMapping",
+      "label": "dim-product.prod_cr_id is fund-id",
+      "summary": "dim-product.prod_cr_id is fund-id",
+      "attributes": {
+        "transform": "lpad: 5, '0'"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "dim-product.prod_cr_id is fund-id"
+        }
+      ]
+    },
+    {
+      "id": "termmapping.state",
+      "type": "TermMapping",
+      "label": "dim-product.state is fund-state",
+      "summary": "dim-product.state is fund-state",
+      "attributes": {
+        "transform": "code_map: fund-state"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "dim-product.state is fund-state"
+        }
+      ]
+    },
+    {
+      "id": "termmapping.fund-id",
+      "type": "TermMapping",
+      "label": "fund-holding.fund_id is fund-id",
+      "summary": "fund-holding.fund_id is fund-id",
+      "attributes": {
+        "transform": "identity"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund-holding.fund_id is fund-id"
+        }
+      ]
+    },
+    {
+      "id": "termmapping.holding-name",
+      "type": "TermMapping",
+      "label": "fund-holding.holding_name is holding-name",
+      "summary": "fund-holding.holding_name is holding-name",
+      "attributes": {
+        "transform": "trim"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund-holding.holding_name is holding-name"
+        }
+      ]
+    },
+    {
+      "id": "termmapping.language-code",
+      "type": "TermMapping",
+      "label": "fund-holding.language_code is language",
+      "summary": "fund-holding.language_code is language",
+      "attributes": {
+        "transform": "lower"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund-holding.language_code is language"
+        }
+      ]
+    },
+    {
+      "id": "dataset.bronze.source__fund_holding",
+      "type": "Dataset",
+      "label": "bronze.source__fund_holding",
+      "summary": "bronze.source__fund_holding",
+      "attributes": {
+        "layer": "bronze",
+        "dataset_kind": "table",
+        "partition_by": "batch_id"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "bronze.source__fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "dataset.bronze.source__dim_product",
+      "type": "Dataset",
+      "label": "bronze.source__dim_product",
+      "summary": "bronze.source__dim_product",
+      "attributes": {
+        "layer": "bronze",
+        "dataset_kind": "table",
+        "partition_by": "batch_id"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "bronze.source__dim_product"
+        }
+      ]
+    },
+    {
+      "id": "dataset.silver.fund",
+      "type": "Dataset",
+      "label": "silver.fund",
+      "summary": "silver.fund",
+      "attributes": {
+        "layer": "silver",
+        "dataset_kind": "table",
+        "partition_by": "batch_id"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund"
+        }
+      ]
+    },
+    {
+      "id": "dataset.silver.fund_holding",
+      "type": "Dataset",
+      "label": "silver.fund_holding",
+      "summary": "silver.fund_holding",
+      "attributes": {
+        "layer": "silver",
+        "dataset_kind": "table",
+        "partition_by": "batch_id"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "dataset.gold.portfolio_holdings",
+      "type": "Dataset",
+      "label": "gold.portfolio_holdings",
+      "summary": "gold.portfolio_holdings",
+      "attributes": {
+        "layer": "gold",
+        "dataset_kind": "table",
+        "partition_by": "batch_id"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_holdings"
+        }
+      ]
+    },
+    {
+      "id": "dataset.gold.portfolio_allocations",
+      "type": "Dataset",
+      "label": "gold.portfolio_allocations",
+      "summary": "gold.portfolio_allocations",
+      "attributes": {
+        "layer": "gold",
+        "dataset_kind": "table",
+        "partition_by": "batch_id"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_allocations"
+        }
+      ]
+    },
+    {
+      "id": "dataset.control.batch",
+      "type": "Dataset",
+      "label": "control.batch",
+      "summary": "control.batch",
+      "attributes": {
+        "layer": "control",
+        "dataset_kind": "table",
+        "partition_by": "batch_id"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "control.batch"
+        }
+      ]
+    },
+    {
+      "id": "field.silver.fund.fund_id",
+      "type": "DatasetField",
+      "label": "silver.fund.fund_id",
+      "summary": "silver.fund.fund_id",
+      "attributes": {
+        "data_type": "char(5)",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund.fund_id"
+        }
+      ]
+    },
+    {
+      "id": "field.silver.fund.state",
+      "type": "DatasetField",
+      "label": "silver.fund.state",
+      "summary": "silver.fund.state",
+      "attributes": {
+        "data_type": "varchar",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund.state"
+        }
+      ]
+    },
+    {
+      "id": "field.silver.fund_holding.fund_id",
+      "type": "DatasetField",
+      "label": "silver.fund_holding.fund_id",
+      "summary": "silver.fund_holding.fund_id",
+      "attributes": {
+        "data_type": "char(5)",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund_holding.fund_id"
+        }
+      ]
+    },
+    {
+      "id": "field.silver.fund_holding.holding_name",
+      "type": "DatasetField",
+      "label": "silver.fund_holding.holding_name",
+      "summary": "silver.fund_holding.holding_name",
+      "attributes": {
+        "data_type": "varchar",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund_holding.holding_name"
+        }
+      ]
+    },
+    {
+      "id": "field.silver.fund_holding.holding_pct",
+      "type": "DatasetField",
+      "label": "silver.fund_holding.holding_pct",
+      "summary": "silver.fund_holding.holding_pct",
+      "attributes": {
+        "data_type": "decimal",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund_holding.holding_pct"
+        }
+      ]
+    },
+    {
+      "id": "field.silver.fund_holding.language_code",
+      "type": "DatasetField",
+      "label": "silver.fund_holding.language_code",
+      "summary": "silver.fund_holding.language_code",
+      "attributes": {
+        "data_type": "char(2)",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "silver.fund_holding.language_code"
+        }
+      ]
+    },
+    {
+      "id": "field.gold.portfolio_holdings.fund_id",
+      "type": "DatasetField",
+      "label": "gold.portfolio_holdings.fund_id",
+      "summary": "gold.portfolio_holdings.fund_id",
+      "attributes": {
+        "data_type": "char(5)",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_holdings.fund_id"
+        }
+      ]
+    },
+    {
+      "id": "field.gold.portfolio_holdings.language_code",
+      "type": "DatasetField",
+      "label": "gold.portfolio_holdings.language_code",
+      "summary": "gold.portfolio_holdings.language_code",
+      "attributes": {
+        "data_type": "char(2)",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_holdings.language_code"
+        }
+      ]
+    },
+    {
+      "id": "field.gold.portfolio_holdings.holding_name",
+      "type": "DatasetField",
+      "label": "gold.portfolio_holdings.holding_name",
+      "summary": "gold.portfolio_holdings.holding_name",
+      "attributes": {
+        "data_type": "varchar",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_holdings.holding_name"
+        }
+      ]
+    },
+    {
+      "id": "field.gold.portfolio_holdings.holding_pct",
+      "type": "DatasetField",
+      "label": "gold.portfolio_holdings.holding_pct",
+      "summary": "gold.portfolio_holdings.holding_pct",
+      "attributes": {
+        "data_type": "decimal",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_holdings.holding_pct"
+        }
+      ]
+    },
+    {
+      "id": "field.gold.portfolio_holdings.holding_rank",
+      "type": "DatasetField",
+      "label": "gold.portfolio_holdings.holding_rank",
+      "summary": "gold.portfolio_holdings.holding_rank",
+      "attributes": {
+        "data_type": "integer",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_holdings.holding_rank"
+        }
+      ]
+    },
+    {
+      "id": "field.gold.portfolio_allocations.fund_id",
+      "type": "DatasetField",
+      "label": "gold.portfolio_allocations.fund_id",
+      "summary": "gold.portfolio_allocations.fund_id",
+      "attributes": {
+        "data_type": "char(5)",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_allocations.fund_id"
+        }
+      ]
+    },
+    {
+      "id": "field.gold.portfolio_allocations.allocation_pct",
+      "type": "DatasetField",
+      "label": "gold.portfolio_allocations.allocation_pct",
+      "summary": "gold.portfolio_allocations.allocation_pct",
+      "attributes": {
+        "data_type": "decimal",
+        "required": true
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "gold.portfolio_allocations.allocation_pct"
+        }
+      ]
+    },
+    {
+      "id": "tolerance.count-exact",
+      "type": "Tolerance",
+      "label": "exact count",
+      "summary": "exact count",
+      "attributes": {
+        "value": 0,
+        "tolerance_unit": "count",
+        "rationale": "The fact-sheet list is exhaustive."
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "exact count"
+        }
+      ]
+    },
+    {
+      "id": "tolerance.count-10",
+      "type": "Tolerance",
+      "label": "ten rows",
+      "summary": "ten rows",
+      "attributes": {
+        "value": 10,
+        "tolerance_unit": "count",
+        "rationale": "A fund may hold fewer than ten positions."
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "ten rows"
+        }
+      ]
+    },
+    {
+      "id": "conformedentity.fund",
+      "type": "ConformedEntity",
+      "label": "fund",
+      "summary": "fund",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund"
+        }
+      ]
+    },
+    {
+      "id": "historypolicy.fund",
+      "type": "HistoryPolicy",
+      "label": "fund history",
+      "summary": "fund history",
+      "attributes": {
+        "history_kind": "snapshot_per_batch"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund history"
+        }
+      ]
+    },
+    {
+      "id": "scoperule.fund",
+      "type": "ScopeRule",
+      "label": "fund scope",
+      "summary": "fund scope",
+      "attributes": {
+        "conditions": [
+          "state != CLOSED"
+        ],
+        "expected_count": 103,
+        "count_as_of": "2026-06-30",
+        "count_source": "the fact-sheet list"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund scope"
+        }
+      ]
+    },
+    {
+      "id": "identitymapping.fund.dim-product",
+      "type": "IdentityMapping",
+      "label": "fund id from source.dim_product",
+      "summary": "fund id from source.dim_product",
+      "attributes": {
+        "transform": "lpad: 5, '0'"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund id from source.dim_product"
+        }
+      ]
+    },
+    {
+      "id": "conformedentity.fund-holding",
+      "type": "ConformedEntity",
+      "label": "fund holding",
+      "summary": "fund holding",
+      "attributes": {},
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund holding"
+        }
+      ]
+    },
+    {
+      "id": "historypolicy.fund-holding",
+      "type": "HistoryPolicy",
+      "label": "fund-holding history",
+      "summary": "fund-holding history",
+      "attributes": {
+        "history_kind": "snapshot_per_batch"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund-holding history"
+        }
+      ]
+    },
+    {
+      "id": "scoperule.fund-holding",
+      "type": "ScopeRule",
+      "label": "fund-holding scope",
+      "summary": "fund-holding scope",
+      "attributes": {
+        "conditions": [
+          "fund_id exists_in silver.fund"
+        ],
+        "expected_count": 1030,
+        "count_as_of": "2026-06-30",
+        "count_source": "the fact-sheet list: 103 funds, ten holdings each"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund-holding scope"
+        }
+      ]
+    },
+    {
+      "id": "identitymapping.fund-holding.fund-holding",
+      "type": "IdentityMapping",
+      "label": "fund-holding id from source.fund_holding",
+      "summary": "fund-holding id from source.fund_holding",
+      "attributes": {
+        "transform": "identity"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund-holding id from source.fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "identitymapping.fund.fund-holding",
+      "type": "IdentityMapping",
+      "label": "fund id from source.fund_holding",
+      "summary": "fund id from source.fund_holding",
+      "attributes": {
+        "transform": "identity"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund id from source.fund_holding"
+        }
+      ]
+    },
+    {
+      "id": "output.portfolio-holdings",
+      "type": "Output",
+      "label": "portfolio_holdings",
+      "summary": "portfolio_holdings",
+      "attributes": {
+        "shape": "long",
+        "period_dependency": "point_in_time",
+        "needs_history": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "portfolio_holdings"
+        }
+      ]
+    },
+    {
+      "id": "output.portfolio-allocations",
+      "type": "Output",
+      "label": "portfolio_allocations",
+      "summary": "portfolio_allocations",
+      "attributes": {
+        "shape": "long",
+        "period_dependency": "point_in_time",
+        "needs_history": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "portfolio_allocations"
+        }
+      ]
+    },
+    {
+      "id": "datacontract.portfolio-holdings-v1",
+      "type": "DataContract",
+      "label": "portfolio_holdings v1",
+      "summary": "portfolio_holdings v1",
+      "attributes": {
+        "version": "1",
+        "contract_fields": [
+          "fund_id: char(5), required",
+          "language_code: char(2), required",
+          "holding_name: varchar, required",
+          "holding_pct: decimal, required",
+          "holding_rank: integer, required"
+        ],
+        "keys": [
+          "fund_id",
+          "language_code",
+          "holding_rank"
+        ],
+        "change_policy": "additive_only"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "portfolio_holdings v1"
+        }
+      ]
+    },
+    {
+      "id": "derivationrule.holdings-top-10",
+      "type": "DerivationRule",
+      "label": "holdings top 10",
+      "summary": "holdings top 10",
+      "attributes": {
+        "rule_kind": "ranking",
+        "logic": "rank_by: {order: [holding_pct desc], partition: [fund_id, language_code], top: 10, ties: first_by: holding_name}",
+        "period_dependency": "point_in_time",
+        "specified_in": "§spec-3.4"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holdings top 10"
+        }
+      ]
+    },
+    {
+      "id": "edgecase.holdings-top-10.tie",
+      "type": "EdgeCase",
+      "label": "holdings top 10 on tie",
+      "summary": "holdings top 10 on tie",
+      "attributes": {
+        "case": "tie",
+        "behaviour": "first_by: holding_name"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holdings top 10 on tie"
+        }
+      ]
+    },
+    {
+      "id": "edgecase.holdings-top-10.null_input",
+      "type": "EdgeCase",
+      "label": "holdings top 10 on null input",
+      "summary": "holdings top 10 on null input",
+      "attributes": {
+        "case": "null_input",
+        "behaviour": "exclude"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holdings top 10 on null input"
+        }
+      ]
+    },
+    {
+      "id": "edgecase.holdings-top-10.missing_history",
+      "type": "EdgeCase",
+      "label": "holdings top 10 on missing history",
+      "summary": "holdings top 10 on missing history",
+      "attributes": {
+        "case": "missing_history",
+        "behaviour": "exclude"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holdings top 10 on missing history"
+        }
+      ]
+    },
+    {
+      "id": "edgecase.holdings-top-10.younger_than_lookback",
+      "type": "EdgeCase",
+      "label": "holdings top 10 on younger than lookback",
+      "summary": "holdings top 10 on younger than lookback",
+      "attributes": {
+        "case": "younger_than_lookback",
+        "behaviour": "include_as: null"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holdings top 10 on younger than lookback"
+        }
+      ]
+    },
+    {
+      "id": "edgecase.holdings-top-10.duplicate_input",
+      "type": "EdgeCase",
+      "label": "holdings top 10 on duplicate input",
+      "summary": "holdings top 10 on duplicate input",
+      "attributes": {
+        "case": "duplicate_input",
+        "behaviour": "error"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holdings top 10 on duplicate input"
+        }
+      ]
+    },
+    {
+      "id": "ruleexample.holdings-top-10",
+      "type": "RuleExample",
+      "label": "holdings top 10 example",
+      "summary": "holdings top 10 example",
+      "attributes": {
+        "inputs": "Fixture/holdings-in",
+        "expected_output": "Fixture/holdings-out",
+        "computed_by": "independent_calculation"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holdings top 10 example"
+        }
+      ]
+    },
+    {
+      "id": "tolerance.pct-0-5",
+      "type": "Tolerance",
+      "label": "half a percent",
+      "summary": "half a percent",
+      "attributes": {
+        "value": 0.5,
+        "tolerance_unit": "percent",
+        "rationale": "Rounding of published weights."
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "half a percent"
+        }
+      ]
+    },
+    {
+      "id": "failureaction.hard-gate",
+      "type": "FailureAction",
+      "label": "stop and tell the platform lead",
+      "summary": "stop and tell the platform lead",
+      "attributes": {
+        "auto_retry": false
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "stop and tell the platform lead"
+        }
+      ]
+    },
+    {
+      "id": "qualityrule.bronze-keys-unique",
+      "type": "QualityRule",
+      "label": "bronze_keys_unique",
+      "summary": "bronze_keys_unique",
+      "attributes": {
+        "rule_id": "bronze_keys_unique",
+        "gate": 1,
+        "assertion": "unique: {table: bronze.source__fund_holding, keys: [fund_id, holding_name, effective_date]}",
+        "severity": "hard",
+        "example_failure": "Fixture/bronze-keys-unique-bad",
+        "specified_in": "§validation-gate-1"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "bronze_keys_unique"
+        }
+      ]
+    },
+    {
+      "id": "qualityrule.fund-count-equals-expected",
+      "type": "QualityRule",
+      "label": "fund_count_equals_expected",
+      "summary": "fund_count_equals_expected",
+      "attributes": {
+        "rule_id": "fund_count_equals_expected",
+        "gate": 2,
+        "assertion": "count_equals: {table: silver.fund, expected: scope_rule.expected_count, tolerance: count-exact}",
+        "severity": "hard",
+        "example_failure": "Fixture/fund-count-equals-expected-bad",
+        "specified_in": "§validation-gate-2"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "fund_count_equals_expected"
+        }
+      ]
+    },
+    {
+      "id": "qualityrule.allocations-sum-100",
+      "type": "QualityRule",
+      "label": "allocations_sum_100",
+      "summary": "allocations_sum_100",
+      "attributes": {
+        "rule_id": "allocations_sum_100",
+        "gate": 3,
+        "assertion": "sum_to: {partition: [fund_id], total: 100, tolerance: pct-0.5}",
+        "severity": "hard",
+        "example_failure": "Fixture/allocations-sum-100-bad",
+        "specified_in": "§validation-gate-3"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "allocations_sum_100"
+        }
+      ]
+    },
+    {
+      "id": "identity.pipeline",
+      "type": "Identity",
+      "label": "pipeline service",
+      "summary": "pipeline service",
+      "attributes": {
+        "identity_kind": "service",
+        "access": [
+          "source: read",
+          "bronze: write",
+          "silver: write",
+          "gold: write",
+          "control: write"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "pipeline service"
+        }
+      ]
+    },
+    {
+      "id": "identity.analyst",
+      "type": "Identity",
+      "label": "analyst",
+      "summary": "analyst",
+      "attributes": {
+        "identity_kind": "human",
+        "access": [
+          "gold: read"
+        ]
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "analyst"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-01"
+    },
+    {
+      "from": "step.fp-01",
+      "rel": "writes",
+      "to": "artifact.control-batch"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-02"
+    },
+    {
+      "from": "step.fp-02",
+      "rel": "waitsFor",
+      "to": "step.fp-01"
+    },
+    {
+      "from": "step.fp-02",
+      "rel": "reads",
+      "to": "artifact.src-fund-holding"
+    },
+    {
+      "from": "step.fp-02",
+      "rel": "reads",
+      "to": "artifact.src-dim-product"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-03"
+    },
+    {
+      "from": "step.fp-03",
+      "rel": "waitsFor",
+      "to": "step.fp-02"
+    },
+    {
+      "from": "step.fp-03",
+      "rel": "reads",
+      "to": "artifact.src-fund-holding"
+    },
+    {
+      "from": "step.fp-03",
+      "rel": "writes",
+      "to": "artifact.bronze-fund-holding"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-04"
+    },
+    {
+      "from": "step.fp-04",
+      "rel": "waitsFor",
+      "to": "step.fp-02"
+    },
+    {
+      "from": "step.fp-04",
+      "rel": "reads",
+      "to": "artifact.src-dim-product"
+    },
+    {
+      "from": "step.fp-04",
+      "rel": "writes",
+      "to": "artifact.bronze-dim-product"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-05"
+    },
+    {
+      "from": "step.fp-05",
+      "rel": "waitsFor",
+      "to": "step.fp-03"
+    },
+    {
+      "from": "step.fp-05",
+      "rel": "waitsFor",
+      "to": "step.fp-04"
+    },
+    {
+      "from": "step.fp-05",
+      "rel": "reads",
+      "to": "artifact.bronze-fund-holding"
+    },
+    {
+      "from": "step.fp-05",
+      "rel": "reads",
+      "to": "artifact.bronze-dim-product"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-06"
+    },
+    {
+      "from": "step.fp-06",
+      "rel": "waitsFor",
+      "to": "step.fp-05"
+    },
+    {
+      "from": "step.fp-06",
+      "rel": "reads",
+      "to": "artifact.bronze-dim-product"
+    },
+    {
+      "from": "step.fp-06",
+      "rel": "reads",
+      "to": "artifact.bronze-fund-holding"
+    },
+    {
+      "from": "step.fp-06",
+      "rel": "writes",
+      "to": "artifact.silver-fund"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-07"
+    },
+    {
+      "from": "step.fp-07",
+      "rel": "waitsFor",
+      "to": "step.fp-05"
+    },
+    {
+      "from": "step.fp-07",
+      "rel": "waitsFor",
+      "to": "step.fp-06"
+    },
+    {
+      "from": "step.fp-07",
+      "rel": "reads",
+      "to": "artifact.bronze-fund-holding"
+    },
+    {
+      "from": "step.fp-07",
+      "rel": "reads",
+      "to": "artifact.silver-fund"
+    },
+    {
+      "from": "step.fp-07",
+      "rel": "writes",
+      "to": "artifact.silver-fund-holding"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-08"
+    },
+    {
+      "from": "step.fp-08",
+      "rel": "waitsFor",
+      "to": "step.fp-06"
+    },
+    {
+      "from": "step.fp-08",
+      "rel": "waitsFor",
+      "to": "step.fp-07"
+    },
+    {
+      "from": "step.fp-08",
+      "rel": "reads",
+      "to": "artifact.silver-fund"
+    },
+    {
+      "from": "step.fp-08",
+      "rel": "reads",
+      "to": "artifact.silver-fund-holding"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-09"
+    },
+    {
+      "from": "step.fp-09",
+      "rel": "waitsFor",
+      "to": "step.fp-08"
+    },
+    {
+      "from": "step.fp-09",
+      "rel": "reads",
+      "to": "artifact.silver-fund"
+    },
+    {
+      "from": "step.fp-09",
+      "rel": "reads",
+      "to": "artifact.silver-fund-holding"
+    },
+    {
+      "from": "step.fp-09",
+      "rel": "writes",
+      "to": "artifact.gold-portfolio-holdings"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-09b"
+    },
+    {
+      "from": "step.fp-09b",
+      "rel": "waitsFor",
+      "to": "step.fp-08"
+    },
+    {
+      "from": "step.fp-09b",
+      "rel": "reads",
+      "to": "artifact.silver-fund-holding"
+    },
+    {
+      "from": "step.fp-09b",
+      "rel": "writes",
+      "to": "artifact.gold-portfolio-allocations"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-10"
+    },
+    {
+      "from": "step.fp-10",
+      "rel": "waitsFor",
+      "to": "step.fp-09"
+    },
+    {
+      "from": "step.fp-10",
+      "rel": "waitsFor",
+      "to": "step.fp-09b"
+    },
+    {
+      "from": "step.fp-10",
+      "rel": "reads",
+      "to": "artifact.gold-portfolio-holdings"
+    },
+    {
+      "from": "step.fp-10",
+      "rel": "reads",
+      "to": "artifact.gold-portfolio-allocations"
+    },
+    {
+      "from": "flow.fund-profile",
+      "rel": "hasStep",
+      "to": "step.fp-11"
+    },
+    {
+      "from": "step.fp-11",
+      "rel": "waitsFor",
+      "to": "step.fp-10"
+    },
+    {
+      "from": "step.fp-11",
+      "rel": "writes",
+      "to": "artifact.control-batch"
+    },
+    {
+      "from": "step.fp-01",
+      "rel": "hasCheck",
+      "to": "check.no-active-batch"
+    },
+    {
+      "from": "check.no-active-batch",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "step.fp-02",
+      "rel": "hasCheck",
+      "to": "check.sources-present-for-period"
+    },
+    {
+      "from": "check.sources-present-for-period",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "step.fp-03",
+      "rel": "hasCheck",
+      "to": "check.fp-03-rerun"
+    },
+    {
+      "from": "check.fp-03-rerun",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "invariant.idempotent",
+      "rel": "enforcedBy",
+      "to": "check.fp-03-rerun"
+    },
+    {
+      "from": "step.fp-04",
+      "rel": "hasCheck",
+      "to": "check.fp-04-rerun"
+    },
+    {
+      "from": "check.fp-04-rerun",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "invariant.idempotent",
+      "rel": "enforcedBy",
+      "to": "check.fp-04-rerun"
+    },
+    {
+      "from": "step.fp-06",
+      "rel": "hasCheck",
+      "to": "check.fp-06-rerun"
+    },
+    {
+      "from": "check.fp-06-rerun",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "invariant.idempotent",
+      "rel": "enforcedBy",
+      "to": "check.fp-06-rerun"
+    },
+    {
+      "from": "step.fp-07",
+      "rel": "hasCheck",
+      "to": "check.fp-07-rerun"
+    },
+    {
+      "from": "check.fp-07-rerun",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "invariant.idempotent",
+      "rel": "enforcedBy",
+      "to": "check.fp-07-rerun"
+    },
+    {
+      "from": "step.fp-09",
+      "rel": "hasCheck",
+      "to": "check.fp-09-rerun"
+    },
+    {
+      "from": "check.fp-09-rerun",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "invariant.idempotent",
+      "rel": "enforcedBy",
+      "to": "check.fp-09-rerun"
+    },
+    {
+      "from": "step.fp-09b",
+      "rel": "hasCheck",
+      "to": "check.fp-09b-rerun"
+    },
+    {
+      "from": "check.fp-09b-rerun",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "invariant.idempotent",
+      "rel": "enforcedBy",
+      "to": "check.fp-09b-rerun"
+    },
+    {
+      "from": "step.fp-05",
+      "rel": "hasCheck",
+      "to": "check.bronze-keys-unique"
+    },
+    {
+      "from": "check.bronze-keys-unique",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "step.fp-08",
+      "rel": "hasCheck",
+      "to": "check.fund-count-equals-expected"
+    },
+    {
+      "from": "check.fund-count-equals-expected",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "check.fund-count-equals-expected",
+      "rel": "measuresMetric",
+      "to": "metric.fund-count"
+    },
+    {
+      "from": "step.fp-08",
+      "rel": "records",
+      "to": "metric.fund-count"
+    },
+    {
+      "from": "check.fund-count-equals-expected",
+      "rel": "comparedTo",
+      "to": "param.expected-fund-count"
+    },
+    {
+      "from": "step.fp-10",
+      "rel": "hasCheck",
+      "to": "check.allocations-sum-100"
+    },
+    {
+      "from": "check.allocations-sum-100",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "check.allocations-sum-100",
+      "rel": "measuresMetric",
+      "to": "metric.allocation-sum"
+    },
+    {
+      "from": "step.fp-10",
+      "rel": "records",
+      "to": "metric.allocation-sum"
+    },
+    {
+      "from": "check.allocations-sum-100",
+      "rel": "comparedTo",
+      "to": "param.pct-tolerance"
+    },
+    {
+      "from": "step.fp-11",
+      "rel": "hasCheck",
+      "to": "check.all-gates-passed"
+    },
+    {
+      "from": "check.all-gates-passed",
+      "rel": "onFail",
+      "to": "outcome.fail"
+    },
+    {
+      "from": "product.fund-profile",
+      "rel": "owned_by",
+      "to": "role.product-owner"
+    },
+    {
+      "from": "product.fund-profile",
+      "rel": "offers",
+      "to": "valueproposition.trusted-fact-sheets"
+    },
+    {
+      "from": "successcriterion.gold-on-time",
+      "rel": "measures",
+      "to": "valueproposition.trusted-fact-sheets"
+    },
+    {
+      "from": "capability.fund-reporting",
+      "rel": "owned_by",
+      "to": "role.product-owner"
+    },
+    {
+      "from": "component.source-database",
+      "rel": "part_of",
+      "to": "sourcesystem.source"
+    },
+    {
+      "from": "component.source-database",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "sourcesystem.source",
+      "rel": "enables",
+      "to": "capability.fund-reporting"
+    },
+    {
+      "from": "component.fund-pages",
+      "rel": "part_of",
+      "to": "system.bi-fund-pages"
+    },
+    {
+      "from": "component.fund-pages",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "system.bi-fund-pages",
+      "rel": "enables",
+      "to": "capability.fund-reporting"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "part_of",
+      "to": "system.fund-profile-pipeline"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "system.fund-profile-pipeline",
+      "rel": "enables",
+      "to": "capability.fund-reporting"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "delivered_by",
+      "to": "sourcesystem.source"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "stewarded_by",
+      "to": "role.data-owner"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "copied_by",
+      "to": "copypolicy.fund-holding"
+    },
+    {
+      "from": "sourcetable.dim-product",
+      "rel": "delivered_by",
+      "to": "sourcesystem.source"
+    },
+    {
+      "from": "sourcetable.dim-product",
+      "rel": "stewarded_by",
+      "to": "role.data-owner"
+    },
+    {
+      "from": "sourcetable.dim-product",
+      "rel": "copied_by",
+      "to": "copypolicy.dim-product"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "has_column",
+      "to": "sourcecolumn.fund-holding.fund_id"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "has_column",
+      "to": "sourcecolumn.fund-holding.holding_name"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "has_column",
+      "to": "sourcecolumn.fund-holding.effective_date"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "has_column",
+      "to": "sourcecolumn.fund-holding.holding_pct"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "has_column",
+      "to": "sourcecolumn.fund-holding.language_code"
+    },
+    {
+      "from": "sourcetable.dim-product",
+      "rel": "has_column",
+      "to": "sourcecolumn.dim-product.prod_cr_id"
+    },
+    {
+      "from": "sourcetable.dim-product",
+      "rel": "has_column",
+      "to": "sourcecolumn.dim-product.state"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "has_key",
+      "to": "sourcecolumn.fund-holding.fund_id"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "has_key",
+      "to": "sourcecolumn.fund-holding.holding_name"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "has_key",
+      "to": "sourcecolumn.fund-holding.effective_date"
+    },
+    {
+      "from": "sourcetable.fund-holding",
+      "rel": "date_column",
+      "to": "sourcecolumn.fund-holding.effective_date"
+    },
+    {
+      "from": "sourcetable.dim-product",
+      "rel": "has_key",
+      "to": "sourcecolumn.dim-product.prod_cr_id"
+    },
+    {
+      "from": "term.fund-id",
+      "rel": "stewarded_by",
+      "to": "role.reference-steward"
+    },
+    {
+      "from": "term.holding-weight",
+      "rel": "stewarded_by",
+      "to": "role.reference-steward"
+    },
+    {
+      "from": "term.fund-state",
+      "rel": "stewarded_by",
+      "to": "role.reference-steward"
+    },
+    {
+      "from": "term.holding-name",
+      "rel": "stewarded_by",
+      "to": "role.reference-steward"
+    },
+    {
+      "from": "term.language",
+      "rel": "stewarded_by",
+      "to": "role.reference-steward"
+    },
+    {
+      "from": "term.fund-state",
+      "rel": "term_code_set",
+      "to": "codeset.fund-state"
+    },
+    {
+      "from": "codeset.fund-state",
+      "rel": "stewarded_by",
+      "to": "role.reference-steward"
+    },
+    {
+      "from": "codemapping.source-a",
+      "rel": "of_code_set",
+      "to": "codeset.fund-state"
+    },
+    {
+      "from": "codemapping.source-a",
+      "rel": "from_system",
+      "to": "sourcesystem.source"
+    },
+    {
+      "from": "codemapping.source-c",
+      "rel": "of_code_set",
+      "to": "codeset.fund-state"
+    },
+    {
+      "from": "codemapping.source-c",
+      "rel": "from_system",
+      "to": "sourcesystem.source"
+    },
+    {
+      "from": "termmapping.holding-pct",
+      "rel": "maps_column",
+      "to": "sourcecolumn.fund-holding.holding_pct"
+    },
+    {
+      "from": "termmapping.holding-pct",
+      "rel": "maps_to",
+      "to": "term.holding-weight"
+    },
+    {
+      "from": "sourcecolumn.fund-holding.holding_pct",
+      "rel": "carries_term",
+      "to": "term.holding-weight"
+    },
+    {
+      "from": "termmapping.prod-cr-id",
+      "rel": "maps_column",
+      "to": "sourcecolumn.dim-product.prod_cr_id"
+    },
+    {
+      "from": "termmapping.prod-cr-id",
+      "rel": "maps_to",
+      "to": "term.fund-id"
+    },
+    {
+      "from": "sourcecolumn.dim-product.prod_cr_id",
+      "rel": "carries_term",
+      "to": "term.fund-id"
+    },
+    {
+      "from": "termmapping.state",
+      "rel": "maps_column",
+      "to": "sourcecolumn.dim-product.state"
+    },
+    {
+      "from": "termmapping.state",
+      "rel": "maps_to",
+      "to": "term.fund-state"
+    },
+    {
+      "from": "sourcecolumn.dim-product.state",
+      "rel": "carries_term",
+      "to": "term.fund-state"
+    },
+    {
+      "from": "termmapping.fund-id",
+      "rel": "maps_column",
+      "to": "sourcecolumn.fund-holding.fund_id"
+    },
+    {
+      "from": "termmapping.fund-id",
+      "rel": "maps_to",
+      "to": "term.fund-id"
+    },
+    {
+      "from": "sourcecolumn.fund-holding.fund_id",
+      "rel": "carries_term",
+      "to": "term.fund-id"
+    },
+    {
+      "from": "termmapping.holding-name",
+      "rel": "maps_column",
+      "to": "sourcecolumn.fund-holding.holding_name"
+    },
+    {
+      "from": "termmapping.holding-name",
+      "rel": "maps_to",
+      "to": "term.holding-name"
+    },
+    {
+      "from": "sourcecolumn.fund-holding.holding_name",
+      "rel": "carries_term",
+      "to": "term.holding-name"
+    },
+    {
+      "from": "termmapping.language-code",
+      "rel": "maps_column",
+      "to": "sourcecolumn.fund-holding.language_code"
+    },
+    {
+      "from": "termmapping.language-code",
+      "rel": "maps_to",
+      "to": "term.language"
+    },
+    {
+      "from": "sourcecolumn.fund-holding.language_code",
+      "rel": "carries_term",
+      "to": "term.language"
+    },
+    {
+      "from": "dataset.bronze.source__fund_holding",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "dataset.bronze.source__fund_holding",
+      "rel": "owned_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "writes_to",
+      "to": "dataset.bronze.source__fund_holding"
+    },
+    {
+      "from": "dataset.bronze.source__dim_product",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "dataset.bronze.source__dim_product",
+      "rel": "owned_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "writes_to",
+      "to": "dataset.bronze.source__dim_product"
+    },
+    {
+      "from": "dataset.silver.fund",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "dataset.silver.fund",
+      "rel": "owned_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "writes_to",
+      "to": "dataset.silver.fund"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "owned_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "writes_to",
+      "to": "dataset.silver.fund_holding"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "owned_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "writes_to",
+      "to": "dataset.gold.portfolio_holdings"
+    },
+    {
+      "from": "dataset.gold.portfolio_allocations",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "dataset.gold.portfolio_allocations",
+      "rel": "owned_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "writes_to",
+      "to": "dataset.gold.portfolio_allocations"
+    },
+    {
+      "from": "dataset.control.batch",
+      "rel": "runs_in",
+      "to": "environment.prod"
+    },
+    {
+      "from": "dataset.control.batch",
+      "rel": "owned_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "component.batch-jobs",
+      "rel": "writes_to",
+      "to": "dataset.control.batch"
+    },
+    {
+      "from": "dataset.silver.fund",
+      "rel": "has_field",
+      "to": "field.silver.fund.fund_id"
+    },
+    {
+      "from": "field.silver.fund.fund_id",
+      "rel": "carries_term",
+      "to": "term.fund-id"
+    },
+    {
+      "from": "field.silver.fund.fund_id",
+      "rel": "fed_by",
+      "to": "sourcecolumn.dim-product.prod_cr_id"
+    },
+    {
+      "from": "dataset.silver.fund",
+      "rel": "has_field",
+      "to": "field.silver.fund.state"
+    },
+    {
+      "from": "field.silver.fund.state",
+      "rel": "carries_term",
+      "to": "term.fund-state"
+    },
+    {
+      "from": "field.silver.fund.state",
+      "rel": "fed_by",
+      "to": "sourcecolumn.dim-product.state"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "has_field",
+      "to": "field.silver.fund_holding.fund_id"
+    },
+    {
+      "from": "field.silver.fund_holding.fund_id",
+      "rel": "carries_term",
+      "to": "term.fund-id"
+    },
+    {
+      "from": "field.silver.fund_holding.fund_id",
+      "rel": "fed_by",
+      "to": "sourcecolumn.fund-holding.fund_id"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "has_field",
+      "to": "field.silver.fund_holding.holding_name"
+    },
+    {
+      "from": "field.silver.fund_holding.holding_name",
+      "rel": "carries_term",
+      "to": "term.holding-name"
+    },
+    {
+      "from": "field.silver.fund_holding.holding_name",
+      "rel": "fed_by",
+      "to": "sourcecolumn.fund-holding.holding_name"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "has_field",
+      "to": "field.silver.fund_holding.holding_pct"
+    },
+    {
+      "from": "field.silver.fund_holding.holding_pct",
+      "rel": "carries_term",
+      "to": "term.holding-weight"
+    },
+    {
+      "from": "field.silver.fund_holding.holding_pct",
+      "rel": "fed_by",
+      "to": "sourcecolumn.fund-holding.holding_pct"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "has_field",
+      "to": "field.silver.fund_holding.language_code"
+    },
+    {
+      "from": "field.silver.fund_holding.language_code",
+      "rel": "carries_term",
+      "to": "term.language"
+    },
+    {
+      "from": "field.silver.fund_holding.language_code",
+      "rel": "fed_by",
+      "to": "sourcecolumn.fund-holding.language_code"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "has_field",
+      "to": "field.gold.portfolio_holdings.fund_id"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.fund_id",
+      "rel": "carries_term",
+      "to": "term.fund-id"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.fund_id",
+      "rel": "fed_by",
+      "to": "field.silver.fund_holding.fund_id"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "has_field",
+      "to": "field.gold.portfolio_holdings.language_code"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.language_code",
+      "rel": "carries_term",
+      "to": "term.language"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.language_code",
+      "rel": "fed_by",
+      "to": "field.silver.fund_holding.language_code"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "has_field",
+      "to": "field.gold.portfolio_holdings.holding_name"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.holding_name",
+      "rel": "carries_term",
+      "to": "term.holding-name"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.holding_name",
+      "rel": "fed_by",
+      "to": "field.silver.fund_holding.holding_name"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "has_field",
+      "to": "field.gold.portfolio_holdings.holding_pct"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.holding_pct",
+      "rel": "carries_term",
+      "to": "term.holding-weight"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.holding_pct",
+      "rel": "fed_by",
+      "to": "field.silver.fund_holding.holding_pct"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "has_field",
+      "to": "field.gold.portfolio_holdings.holding_rank"
+    },
+    {
+      "from": "dataset.gold.portfolio_allocations",
+      "rel": "has_field",
+      "to": "field.gold.portfolio_allocations.fund_id"
+    },
+    {
+      "from": "field.gold.portfolio_allocations.fund_id",
+      "rel": "carries_term",
+      "to": "term.fund-id"
+    },
+    {
+      "from": "field.gold.portfolio_allocations.fund_id",
+      "rel": "fed_by",
+      "to": "field.silver.fund_holding.fund_id"
+    },
+    {
+      "from": "dataset.gold.portfolio_allocations",
+      "rel": "has_field",
+      "to": "field.gold.portfolio_allocations.allocation_pct"
+    },
+    {
+      "from": "field.gold.portfolio_allocations.allocation_pct",
+      "rel": "carries_term",
+      "to": "term.holding-weight"
+    },
+    {
+      "from": "field.gold.portfolio_allocations.allocation_pct",
+      "rel": "fed_by",
+      "to": "field.silver.fund_holding.holding_pct"
+    },
+    {
+      "from": "field.silver.fund.state",
+      "rel": "bound_to",
+      "to": "codeset.fund-state"
+    },
+    {
+      "from": "dataset.silver.fund",
+      "rel": "grain",
+      "to": "field.silver.fund.fund_id"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "grain",
+      "to": "field.silver.fund_holding.fund_id"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "grain",
+      "to": "field.silver.fund_holding.holding_name"
+    },
+    {
+      "from": "dataset.silver.fund_holding",
+      "rel": "grain",
+      "to": "field.silver.fund_holding.language_code"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "grain",
+      "to": "field.gold.portfolio_holdings.fund_id"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "grain",
+      "to": "field.gold.portfolio_holdings.language_code"
+    },
+    {
+      "from": "dataset.gold.portfolio_holdings",
+      "rel": "grain",
+      "to": "field.gold.portfolio_holdings.holding_rank"
+    },
+    {
+      "from": "dataset.gold.portfolio_allocations",
+      "rel": "grain",
+      "to": "field.gold.portfolio_allocations.fund_id"
+    },
+    {
+      "from": "tolerance.count-exact",
+      "rel": "set_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "tolerance.count-10",
+      "rel": "set_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "conformedentity.fund",
+      "rel": "materialised_as",
+      "to": "dataset.silver.fund"
+    },
+    {
+      "from": "conformedentity.fund",
+      "rel": "keeps_history",
+      "to": "historypolicy.fund"
+    },
+    {
+      "from": "conformedentity.fund",
+      "rel": "scoped_by",
+      "to": "scoperule.fund"
+    },
+    {
+      "from": "scoperule.fund",
+      "rel": "within_tolerance",
+      "to": "tolerance.count-exact"
+    },
+    {
+      "from": "conformedentity.fund",
+      "rel": "has_identity_mapping",
+      "to": "identitymapping.fund.dim-product"
+    },
+    {
+      "from": "identitymapping.fund.dim-product",
+      "rel": "from_table",
+      "to": "sourcetable.dim-product"
+    },
+    {
+      "from": "identitymapping.fund.dim-product",
+      "rel": "id_column",
+      "to": "sourcecolumn.dim-product.prod_cr_id"
+    },
+    {
+      "from": "identitymapping.fund.dim-product",
+      "rel": "target_key",
+      "to": "field.silver.fund.fund_id"
+    },
+    {
+      "from": "conformedentity.fund-holding",
+      "rel": "materialised_as",
+      "to": "dataset.silver.fund_holding"
+    },
+    {
+      "from": "conformedentity.fund-holding",
+      "rel": "keeps_history",
+      "to": "historypolicy.fund-holding"
+    },
+    {
+      "from": "conformedentity.fund-holding",
+      "rel": "scoped_by",
+      "to": "scoperule.fund-holding"
+    },
+    {
+      "from": "scoperule.fund-holding",
+      "rel": "within_tolerance",
+      "to": "tolerance.count-10"
+    },
+    {
+      "from": "conformedentity.fund-holding",
+      "rel": "has_identity_mapping",
+      "to": "identitymapping.fund-holding.fund-holding"
+    },
+    {
+      "from": "identitymapping.fund-holding.fund-holding",
+      "rel": "from_table",
+      "to": "sourcetable.fund-holding"
+    },
+    {
+      "from": "identitymapping.fund-holding.fund-holding",
+      "rel": "id_column",
+      "to": "sourcecolumn.fund-holding.fund_id"
+    },
+    {
+      "from": "identitymapping.fund-holding.fund-holding",
+      "rel": "target_key",
+      "to": "field.silver.fund_holding.fund_id"
+    },
+    {
+      "from": "conformedentity.fund",
+      "rel": "has_identity_mapping",
+      "to": "identitymapping.fund.fund-holding"
+    },
+    {
+      "from": "identitymapping.fund.fund-holding",
+      "rel": "from_table",
+      "to": "sourcetable.fund-holding"
+    },
+    {
+      "from": "identitymapping.fund.fund-holding",
+      "rel": "id_column",
+      "to": "sourcecolumn.fund-holding.fund_id"
+    },
+    {
+      "from": "identitymapping.fund.fund-holding",
+      "rel": "target_key",
+      "to": "field.silver.fund.fund_id"
+    },
+    {
+      "from": "output.portfolio-holdings",
+      "rel": "materialised_as",
+      "to": "dataset.gold.portfolio_holdings"
+    },
+    {
+      "from": "output.portfolio-holdings",
+      "rel": "output_of",
+      "to": "product.fund-profile"
+    },
+    {
+      "from": "output.portfolio-holdings",
+      "rel": "joins_to",
+      "to": "conformedentity.fund"
+    },
+    {
+      "from": "output.portfolio-allocations",
+      "rel": "materialised_as",
+      "to": "dataset.gold.portfolio_allocations"
+    },
+    {
+      "from": "output.portfolio-allocations",
+      "rel": "output_of",
+      "to": "product.fund-profile"
+    },
+    {
+      "from": "output.portfolio-allocations",
+      "rel": "joins_to",
+      "to": "conformedentity.fund"
+    },
+    {
+      "from": "role.analyst",
+      "rel": "reads_output",
+      "to": "output.portfolio-holdings"
+    },
+    {
+      "from": "datacontract.portfolio-holdings-v1",
+      "rel": "contract_of",
+      "to": "dataset.gold.portfolio_holdings"
+    },
+    {
+      "from": "datacontract.portfolio-holdings-v1",
+      "rel": "owned_by",
+      "to": "role.product-owner"
+    },
+    {
+      "from": "system.bi-fund-pages",
+      "rel": "consumes",
+      "to": "datacontract.portfolio-holdings-v1"
+    },
+    {
+      "from": "field.gold.portfolio_holdings.holding_rank",
+      "rel": "derived_by",
+      "to": "derivationrule.holdings-top-10"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "rule_input",
+      "to": "field.silver.fund_holding.holding_pct"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "rule_input",
+      "to": "field.silver.fund_holding.fund_id"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "rule_input",
+      "to": "field.silver.fund_holding.language_code"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "has_edge_case",
+      "to": "edgecase.holdings-top-10.tie"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "has_edge_case",
+      "to": "edgecase.holdings-top-10.null_input"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "has_edge_case",
+      "to": "edgecase.holdings-top-10.missing_history"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "has_edge_case",
+      "to": "edgecase.holdings-top-10.younger_than_lookback"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "has_edge_case",
+      "to": "edgecase.holdings-top-10.duplicate_input"
+    },
+    {
+      "from": "derivationrule.holdings-top-10",
+      "rel": "has_example",
+      "to": "ruleexample.holdings-top-10"
+    },
+    {
+      "from": "tolerance.pct-0-5",
+      "rel": "set_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "failureaction.hard-gate",
+      "rel": "notifies",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "failureaction.hard-gate",
+      "rel": "follows_runbook",
+      "to": "runbook.hard-gate-failure"
+    },
+    {
+      "from": "qualityrule.bronze-keys-unique",
+      "rel": "targets",
+      "to": "dataset.bronze.source__fund_holding"
+    },
+    {
+      "from": "qualityrule.bronze-keys-unique",
+      "rel": "carried_out_by",
+      "to": "check.bronze-keys-unique"
+    },
+    {
+      "from": "qualityrule.bronze-keys-unique",
+      "rel": "failure_action",
+      "to": "failureaction.hard-gate"
+    },
+    {
+      "from": "qualityrule.bronze-keys-unique",
+      "rel": "stewarded_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "qualityrule.fund-count-equals-expected",
+      "rel": "targets",
+      "to": "dataset.silver.fund"
+    },
+    {
+      "from": "qualityrule.fund-count-equals-expected",
+      "rel": "carried_out_by",
+      "to": "check.fund-count-equals-expected"
+    },
+    {
+      "from": "qualityrule.fund-count-equals-expected",
+      "rel": "failure_action",
+      "to": "failureaction.hard-gate"
+    },
+    {
+      "from": "qualityrule.fund-count-equals-expected",
+      "rel": "stewarded_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "qualityrule.fund-count-equals-expected",
+      "rel": "within_tolerance",
+      "to": "tolerance.count-exact"
+    },
+    {
+      "from": "qualityrule.allocations-sum-100",
+      "rel": "targets",
+      "to": "dataset.gold.portfolio_allocations"
+    },
+    {
+      "from": "qualityrule.allocations-sum-100",
+      "rel": "targets",
+      "to": "field.gold.portfolio_allocations.allocation_pct"
+    },
+    {
+      "from": "qualityrule.allocations-sum-100",
+      "rel": "carried_out_by",
+      "to": "check.allocations-sum-100"
+    },
+    {
+      "from": "qualityrule.allocations-sum-100",
+      "rel": "failure_action",
+      "to": "failureaction.hard-gate"
+    },
+    {
+      "from": "qualityrule.allocations-sum-100",
+      "rel": "stewarded_by",
+      "to": "role.platform-lead"
+    },
+    {
+      "from": "qualityrule.allocations-sum-100",
+      "rel": "within_tolerance",
+      "to": "tolerance.pct-0-5"
+    },
+    {
+      "from": "step.fp-03",
+      "rel": "executes",
+      "to": "copypolicy.fund-holding"
+    },
+    {
+      "from": "step.fp-04",
+      "rel": "executes",
+      "to": "copypolicy.dim-product"
+    },
+    {
+      "from": "step.fp-06",
+      "rel": "executes",
+      "to": "conformedentity.fund"
+    },
+    {
+      "from": "step.fp-07",
+      "rel": "executes",
+      "to": "conformedentity.fund-holding"
+    },
+    {
+      "from": "step.fp-09",
+      "rel": "executes",
+      "to": "output.portfolio-holdings"
+    },
+    {
+      "from": "step.fp-09",
+      "rel": "executes",
+      "to": "derivationrule.holdings-top-10"
+    },
+    {
+      "from": "step.fp-09b",
+      "rel": "executes",
+      "to": "output.portfolio-allocations"
+    },
+    {
+      "from": "artifact.src-fund-holding",
+      "rel": "represents",
+      "to": "sourcetable.fund-holding"
+    },
+    {
+      "from": "artifact.src-dim-product",
+      "rel": "represents",
+      "to": "sourcetable.dim-product"
+    },
+    {
+      "from": "artifact.bronze-fund-holding",
+      "rel": "represents",
+      "to": "dataset.bronze.source__fund_holding"
+    },
+    {
+      "from": "artifact.bronze-dim-product",
+      "rel": "represents",
+      "to": "dataset.bronze.source__dim_product"
+    },
+    {
+      "from": "artifact.silver-fund",
+      "rel": "represents",
+      "to": "dataset.silver.fund"
+    },
+    {
+      "from": "artifact.silver-fund-holding",
+      "rel": "represents",
+      "to": "dataset.silver.fund_holding"
+    },
+    {
+      "from": "artifact.gold-portfolio-holdings",
+      "rel": "represents",
+      "to": "dataset.gold.portfolio_holdings"
+    },
+    {
+      "from": "artifact.gold-portfolio-allocations",
+      "rel": "represents",
+      "to": "dataset.gold.portfolio_allocations"
+    },
+    {
+      "from": "artifact.control-batch",
+      "rel": "represents",
+      "to": "dataset.control.batch"
+    },
+    {
+      "from": "identity.pipeline",
+      "rel": "in_environment",
+      "to": "environment.prod"
+    },
+    {
+      "from": "identity.pipeline",
+      "rel": "runs_flow",
+      "to": "flow.fund-profile"
+    },
+    {
+      "from": "identity.analyst",
+      "rel": "in_environment",
+      "to": "environment.prod"
+    },
+    {
+      "from": "runbook.hard-gate-failure",
+      "rel": "resumes_from",
+      "to": "step.fp-05"
+    }
+  ]
+}
