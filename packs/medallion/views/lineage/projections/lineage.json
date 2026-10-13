@@ -1,0 +1,294 @@
+{
+ "mode": {
+  "$payload": "mode"
+ },
+ "products": {
+  "$nodes": "Product",
+  "$sort": "label",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "summary": "$summary",
+   "as_of": "$as_of",
+   "period_kind": "$attr.period_kind",
+   "period_end_rule": "$attr.period_end_rule",
+   "freshness_sla": "$attr.freshness_sla"
+  }
+ },
+ "outputs": {
+  "$nodes": "Output",
+  "$sort": "label",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "summary": "$summary",
+   "shape": "$attr.shape",
+   "product": {
+    "$first": {
+     "$out": "output_of",
+     "$select": "$id"
+    }
+   },
+   "entity": {
+    "$first": {
+     "$out": "joins_to",
+     "$select": "$id"
+    }
+   },
+   "dataset": {
+    "$first": {
+     "$out": "materialised_as",
+     "$select": "$id"
+    }
+   },
+   "readers": {
+    "$in": "reads_output",
+    "$select": "$label"
+   },
+   "built_by": {
+    "$first": {
+     "$in": "executes",
+     "$select": {
+      "label": "$label",
+      "kind": "$attr.stepKind"
+     }
+    }
+   }
+  }
+ },
+ "entities": {
+  "$nodes": "ConformedEntity",
+  "$sort": "label",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "summary": "$summary",
+   "dataset": {
+    "$first": {
+     "$out": "materialised_as",
+     "$select": "$id"
+    }
+   },
+   "sources": {
+    "$out": "has_identity_mapping",
+    "$select": {
+     "$first": {
+      "$out": "from_table",
+      "$select": "$id"
+     }
+    }
+   },
+   "scope": {
+    "$out": "scoped_by",
+    "$select": {
+     "label": "$label",
+     "expected_count": "$attr.expected_count"
+    }
+   },
+   "history": {
+    "$first": {
+     "$out": "keeps_history",
+     "$select": "$attr.history_kind"
+    }
+   },
+   "built_by": {
+    "$first": {
+     "$in": "executes",
+     "$select": {
+      "label": "$label",
+      "kind": "$attr.stepKind"
+     }
+    }
+   }
+  }
+ },
+ "datasets": {
+  "$nodes": "Dataset",
+  "$sort": "label",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "summary": "$summary",
+   "layer": "$attr.layer",
+   "kind": "$attr.dataset_kind",
+   "fields": {
+    "$out": "has_field",
+    "$select": "$id"
+   },
+   "contract": {
+    "$first": {
+     "$in": "contract_of",
+     "$select": {
+      "label": "$label",
+      "version": "$attr.version",
+      "change_policy": "$attr.change_policy"
+     }
+    }
+   }
+  }
+ },
+ "fields": {
+  "$nodes": "DatasetField",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "summary": "$summary",
+   "type": "$attr.data_type",
+   "required": "$attr.required",
+   "term": {
+    "$first": {
+     "$out": "carries_term",
+     "$select": "$label"
+    }
+   },
+   "dataset": {
+    "$first": {
+     "$in": "has_field",
+     "$select": "$id"
+    }
+   },
+   "derived_by": {
+    "$first": {
+     "$out": "derived_by",
+     "$select": "$id"
+    }
+   },
+   "fed_by": {
+    "$out": "fed_by",
+    "$select": "$id"
+   },
+   "report": {
+    "$optional": {
+     "$in": "is_field",
+     "$select": {
+      "column": "$label",
+      "shown_as": {
+       "$in": "sourcedFrom",
+       "$select": {
+        "label": "$label",
+        "report": {
+         "$first": {
+          "$out": "inReport",
+          "$select": "$label"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "rules": {
+  "$nodes": "DerivationRule",
+  "$sort": "label",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "summary": "$summary",
+   "kind": "$attr.rule_kind",
+   "logic": "$attr.logic",
+   "period_dependency": "$attr.period_dependency",
+   "inputs": {
+    "$out": "rule_input",
+    "$select": "$id"
+   },
+   "examples": {
+    "$count": {
+     "$out": "has_example"
+    }
+   },
+   "edge_cases": {
+    "$out": "has_edge_case",
+    "$select": {
+     "case": "$attr.case",
+     "behaviour": "$attr.behaviour"
+    }
+   },
+   "built_by": {
+    "$first": {
+     "$in": "executes",
+     "$select": {
+      "label": "$label",
+      "kind": "$attr.stepKind"
+     }
+    }
+   }
+  }
+ },
+ "columns": {
+  "$nodes": "SourceColumn",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "type": "$attr.source_type",
+   "term": {
+    "$first": {
+     "$out": "carries_term",
+     "$select": "$label"
+    }
+   },
+   "table": {
+    "$first": {
+     "$in": "has_column",
+     "$select": "$id"
+    }
+   }
+  }
+ },
+ "tables": {
+  "$nodes": "SourceTable",
+  "$sort": "label",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "summary": "$summary",
+   "change_behaviour": "$attr.change_behaviour",
+   "system": {
+    "$first": {
+     "$out": "delivered_by",
+     "$select": "$label"
+    }
+   },
+   "copy": {
+    "$first": {
+     "$out": "copied_by",
+     "$select": {
+      "method": "$attr.method",
+      "built_by": {
+       "$first": {
+        "$in": "executes",
+        "$select": {
+         "label": "$label",
+         "kind": "$attr.stepKind"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "quality": {
+  "$nodes": "QualityRule",
+  "$sort": "attr.gate",
+  "$map": {
+   "id": "$id",
+   "label": "$label",
+   "rule_id": "$attr.rule_id",
+   "gate": "$attr.gate",
+   "severity": "$attr.severity",
+   "assertion": "$attr.assertion",
+   "targets": {
+    "$out": "targets",
+    "$select": "$id"
+   },
+   "report_checks": {
+    "$optional": {
+     "$in": "backed_by",
+     "$select": "$label"
+    }
+   }
+  }
+ }
+}

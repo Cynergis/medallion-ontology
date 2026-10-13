@@ -69,8 +69,24 @@ It needs the report ontology at release 5, which composes `QualityCheck`: `oto/r
 [Cynergis/report-ontology](https://github.com/Cynergis/report-ontology), which CI checks out beside
 `flow` (`REPORT_ONTOLOGY`, default `../report-ontology/oto/report`).
 
-Next: the `medallion` pack, with a pipeline-design skill walking D1–D9 checkpoint by checkpoint
-and a lineage view.
+## The packs
+
+What a person installs in Claude Code, each embedding its unit and everything the unit extends, so
+nothing else is fetched:
+
+- **`medallion`** (`packs/medallion`): the skill **design-pipeline** walks the specification's nine
+  checkpoints, D1 to D9, through the curate gates, a checkpoint closing when its gap questions come
+  back empty and its approver confirms the catalogue read back to them; the view **lineage** walks a
+  gold or silver field up to its source column, with the step that builds each part, the quality
+  rules that guard it, and the gaps on the way.
+- **`report-medallion`** (`packs/report-medallion`): the bridge alone, for a report product with a
+  pipeline. With it in the project, the lineage view draws the report fields that show a value on
+  top.
+
+A product names them beside its own pack (engine 0.11.8 or later resolves an installed pack's
+ontology by name): `oto init --pack prd-architecture-studio --ontology product-report,ddd,medallion,report-medallion,flow`.
+A change to a unit is released by rebuilding it, then `oto pack refresh packs/<name>` for each pack
+that embeds it; the tests refuse a pack that embeds an outdated unit.
 
 ## Layout
 
@@ -78,6 +94,8 @@ and a lineage view.
 |---|---|
 | `ontology/medallion/`, `ontology/report-medallion/` | The two units: manifest, vocabulary, rules, questions, rationale, sample, README. Written by `tools/build.py`; never edited by hand. |
 | `tools/build.py`, `tools/design.py` | Write the units: the flow slice in the first, the design slice and the bridge in the second. Change them, run the build, commit both. |
+| `packs/medallion/`, `packs/report-medallion/` | The packs: manifest, embedded ontologies (written by `oto pack refresh`, never by hand), skills, the lineage view. |
+| `tests/test_packs.py` | Both packs check clean and embed the committed units; the lineage view, built from each pack's sample, walks a gold field to its source, and with the bridge shows the report field on top. |
 | `tests/test_medallion.py` | The committed units are what the build writes; both compose and their samples answer every question; the specification's worked instance is accepted, and twenty variants are each refused, flagged or reported as decided. |
 | `DECISIONS.md` | What was decided, by whom and when, and why: names, quality levels, contracts, the report link. |
 
@@ -85,7 +103,8 @@ and a lineage view.
 
 ```bash
 python tools/build.py                                     # write ontology/medallion and ontology/report-medallion
-FLOW_ONTOLOGY=../report-ontology/oto/flow pytest -q tests  # needs oto-kg 0.11.7 or later
+FLOW_ONTOLOGY=../report-ontology/oto/flow pytest -q tests  # needs oto-kg 0.11.8 or later
+oto pack refresh packs/medallion && oto pack refresh packs/report-medallion   # after a unit changes
 oto ontology add <this repository> --path ontology/medallion          # install them on a machine
 oto ontology add <this repository> --path ontology/report-medallion
 oto init --empty --pack prd-architecture-studio --ontology product-report,ddd,medallion,report-medallion,flow --project <root>

@@ -48,3 +48,19 @@ that composes them would keep one definition silently.
   never carries the other's vocabulary; a report product with a pipeline adds the bridge at init.
 
 Decided by Chiheb Dkhil.
+
+## 2026-10-13: the packs
+
+- **The bridge is its own pack, `report-medallion`**, beside `medallion`. *Why:* a pack embeds one
+  ontology and what it extends, and a refresh rewrites what it embeds; a pipeline with no report
+  must not carry the report vocabulary, so the medallion pack cannot carry the bridge.
+- **The lineage view lives in the `medallion` pack**, and draws the report side only when the bridge
+  is in the project (`$optional`). A project started from another pack names it by path. *Why:* the
+  lineage is the pipeline's; the report is one consumer of it.
+- **A checkpoint closes when its gap questions come back empty and its approver confirms**: the last
+  group of the step is applied with the approver as `--by`. What is missing is reported, never
+  invented. *Why:* the specification's "a step cannot close with a proposed instance in it", on the
+  gates the engine already has.
+
+The bridge's own pack decided by Chiheb Dkhil; the view's place and the checkpoint rule proposed
+with the packs, confirmed by merging them.

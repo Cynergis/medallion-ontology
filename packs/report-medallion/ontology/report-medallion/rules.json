@@ -1,0 +1,114 @@
+{
+  "_about": "Where a report meets its pipeline, each rule naming the question it protects.",
+  "rules": [
+    {
+      "id": "a-report-reads-gold",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "t",
+          "type": "Table"
+        },
+        {
+          "edge": [
+            "t",
+            "is_dataset",
+            "d"
+          ]
+        },
+        {
+          "node": "d",
+          "type": "Dataset",
+          "where": {
+            "layer": {
+              "!=": "gold"
+            }
+          }
+        }
+      ],
+      "then": {
+        "flag": "a report's table is a dataset outside gold"
+      },
+      "why": "A report reads gold: what consumers read (DECISIONS.md, D5).",
+      "validated_by": "",
+      "answers": "RM1"
+    },
+    {
+      "id": "a-report-column-is-a-field-of-its-table",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "c",
+          "type": "Column"
+        },
+        {
+          "edge": [
+            "c",
+            "inTable",
+            "t"
+          ]
+        },
+        {
+          "edge": [
+            "t",
+            "is_dataset",
+            "d"
+          ]
+        },
+        {
+          "edge": [
+            "c",
+            "is_field",
+            "f"
+          ]
+        },
+        {
+          "not_edge": [
+            "d",
+            "has_field",
+            "f"
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a report column is a field of another dataset than its table's"
+      },
+      "why": "A column and its table are one dataset and one of its fields.",
+      "validated_by": "",
+      "answers": "RM1"
+    },
+    {
+      "id": "a-report-reads-a-contracted-dataset",
+      "kind": "policy",
+      "severity": "warn",
+      "when": [
+        {
+          "node": "t",
+          "type": "Table"
+        },
+        {
+          "edge": [
+            "t",
+            "is_dataset",
+            "d"
+          ]
+        },
+        {
+          "not_edge": [
+            "*",
+            "contract_of",
+            "d"
+          ]
+        }
+      ],
+      "then": {
+        "flag": "a report reads a gold dataset no data contract governs"
+      },
+      "why": "What a report depends on is promised by a contract, so a change to it is versioned (D5).",
+      "validated_by": "",
+      "answers": "RM1"
+    }
+  ]
+}

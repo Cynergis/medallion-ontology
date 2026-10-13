@@ -1,0 +1,113 @@
+{
+  "_about": "The lineage of a report's value, and the checks it relies on.",
+  "questions": {
+    "RM1": {
+      "who": "an analyst",
+      "question": "Which report columns are which gold dataset fields, and where does each field come from?",
+      "why": "The lineage of a report's value: the column, the gold field, the rule or the field that feeds it.",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "c",
+            "type": "Column"
+          },
+          {
+            "edge": [
+              "c",
+              "is_field",
+              "f"
+            ]
+          },
+          {
+            "node": "f",
+            "type": "DatasetField"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "c",
+                  "inTable",
+                  "t"
+                ]
+              },
+              {
+                "edge": [
+                  "t",
+                  "is_dataset",
+                  "d"
+                ]
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "f",
+                  "derived_by",
+                  "r"
+                ]
+              },
+              {
+                "node": "r",
+                "type": "DerivationRule"
+              }
+            ]
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "f",
+                  "fed_by",
+                  "x"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "c.columnName",
+          "d.label",
+          "f.label",
+          "r.label",
+          "x.label"
+        ]
+      },
+      "gate": "non_empty"
+    },
+    "RM2": {
+      "who": "compliance",
+      "question": "Which report quality checks rely on which pipeline quality rules, at which gate?",
+      "why": "Two levels, no overlap: the pipeline checks the data at its gate; the report checks what it adds (DECISIONS.md).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "k",
+            "type": "QualityCheck"
+          },
+          {
+            "edge": [
+              "k",
+              "backed_by",
+              "r"
+            ]
+          },
+          {
+            "node": "r",
+            "type": "QualityRule"
+          }
+        ],
+        "select": [
+          "k.label",
+          "r.rule_id",
+          "r.gate"
+        ]
+      },
+      "gate": "any"
+    }
+  }
+}

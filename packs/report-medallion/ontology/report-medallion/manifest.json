@@ -1,0 +1,33 @@
+{
+  "name": "report-medallion",
+  "release": 1,
+  "domain": "reporting",
+  "summary": "Where a report meets its pipeline: a report's table is the gold dataset it reads, a column the dataset field behind it, a report's quality check the pipeline rule it relies on.",
+  "extends": [
+    "report",
+    "medallion"
+  ],
+  "namespace": "https://cynergis.ai/ont/report-medallion#",
+  "engine": ">=0.11.7",
+  "carries": [
+    "vocabulary",
+    "rationale",
+    "rules",
+    "questions",
+    "sample",
+    "readme"
+  ],
+  "maintainer": "Cynergis",
+  "changelog": [
+    {
+      "release": 1,
+      "at": "2026-10-13",
+      "note": "The report link of DECISIONS.md: is_dataset, is_field, backed_by; a report reads gold, a column is a field of its table's dataset, a read dataset has a contract."
+    }
+  ],
+  "source": "https://github.com/Cynergis/medallion-ontology",
+  "path": "ontology/report-medallion",
+  "commit": "17382e8",
+  "fetched_at": "2026-10-13T15:28:09+00:00",
+  "_about": "The ontology's identity: its release rises on every published change, `extends` names what it composes on top of, `carries` what the directory holds."
+}

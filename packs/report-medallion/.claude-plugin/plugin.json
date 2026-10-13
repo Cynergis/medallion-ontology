@@ -1,0 +1,17 @@
+{
+  "name": "report-medallion",
+  "displayName": "Report and medallion (OTO pack)",
+  "description": "The bridge between a report and the medallion pipeline that feeds it: a report's table is the gold dataset it reads, a column the field behind it, a report check backed by the pipeline rule it relies on.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Cynergis"
+  },
+  "dependencies": [
+    "oto"
+  ],
+  "keywords": [
+    "reporting",
+    "oto",
+    "knowledge-graph"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "medallion",
+  "displayName": "Medallion pipeline (OTO pack)",
+  "description": "Design a medallion data pipeline for a part of a product, source systems to bronze, silver and gold, checkpoint by checkpoint (D1-D9), and the batch flow that runs it, checked by the medallion rules at every capture.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Cynergis"
+  },
+  "dependencies": [
+    "oto"
+  ],
+  "keywords": [
+    "data",
+    "oto",
+    "knowledge-graph"
+  ]
+}

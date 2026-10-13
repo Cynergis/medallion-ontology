@@ -1,0 +1,403 @@
+{
+  "_about": "Why each term exists: the specification's step it comes from. The rules carry their own `why`. `validated_by` is empty until a person who knows the domain confirms the entry.",
+  "classes": {
+    "SourceSystem": {
+      "question": "Which source tables does each source system deliver, read how, keyed on what, changing how, copied how?",
+      "why": "The copy mechanism depends on how a system is read; a filter on the source is allowed only where its owner agreed.",
+      "alternatives": "A plain System with these as attributes of every system: rejected, they mean nothing for an application.",
+      "validated_by": ""
+    },
+    "SourceTable": {
+      "question": "Which source tables does each source system deliver, read how, keyed on what, changing how, copied how?",
+      "why": "A source table's change behaviour decides its copy policy, and its keys and date column decide the slice; a guess here corrupts every batch silently.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "SourceColumn": {
+      "question": "Which source tables does each source system deliver, read how, keyed on what, changing how, copied how?",
+      "why": "Silver fields are fed by columns and terms are carried by them; the fixtures need their real values.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "CopyPolicy": {
+      "question": "Which source tables does each source system deliver, read how, keyed on what, changing how, copied how?",
+      "why": "The bronze copy is generated from it: method, lookback, filter, retention.",
+      "alternatives": "Attributes on the source table: rejected, a policy is reviewed and changed on its own.",
+      "validated_by": ""
+    },
+    "TermMapping": {
+      "question": "Which term does each mapped source column carry, through which transform, and which code sets map which source values?",
+      "why": "The transform from source form to canonical is what the silver build applies, per column.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "CodeSet": {
+      "question": "Which term does each mapped source column carry, through which transform, and which code sets map which source values?",
+      "why": "Allowed values and their labels per language are checked at gate 2 (in_set) and published by the report.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "CodeMapping": {
+      "question": "Which term does each mapped source column carry, through which transform, and which code sets map which source values?",
+      "why": "Two sources write the same meaning differently; the mapping is what makes them one value.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "ConformedEntity": {
+      "question": "How is each conformed entity resolved: its dataset and grain, each source's identity mapping, its scope and tolerance, its history?",
+      "why": "Silver resolves each business thing once; every output joins to it, so it is designed before any output.",
+      "alternatives": "The specification's name Entity: rejected, ddd declares Entity for something else (DECISIONS.md).",
+      "validated_by": ""
+    },
+    "IdentityMapping": {
+      "question": "How is each conformed entity resolved: its dataset and grain, each source's identity mapping, its scope and tolerance, its history?",
+      "why": "Each source spells the same id its own way; without the mapping two rows of one fund are two funds.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "ScopeRule": {
+      "question": "How is each conformed entity resolved: its dataset and grain, each source's identity mapping, its scope and tolerance, its history?",
+      "why": "Gate 2 reconciles the entity against an expected count; the scope says which instances count.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "HistoryPolicy": {
+      "question": "How is each conformed entity resolved: its dataset and grain, each source's identity mapping, its scope and tolerance, its history?",
+      "why": "Whether past periods are kept decides the silver build and what consumers can ask for.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "Dataset": {
+      "question": "What does each output promise: its dataset, layer and fields, the entity it joins, its contract's version, keys and change policy?",
+      "why": "Every layer's tables are generated from it: layer, partitioning, grain, fields.",
+      "alternatives": "The specification's name Table: rejected, the report ontology declares Table for the table a report reads (DECISIONS.md).",
+      "validated_by": ""
+    },
+    "DatasetField": {
+      "question": "What does each output promise: its dataset, layer and fields, the entity it joins, its contract's version, keys and change policy?",
+      "why": "A field's type, term and origin (derived or fed) are what lineage and the contract are made of.",
+      "alternatives": "The specification's name Field: rejected, the report ontology declares Field (DECISIONS.md).",
+      "validated_by": ""
+    },
+    "Output": {
+      "question": "What does each output promise: its dataset, layer and fields, the entity it joins, its contract's version, keys and change policy?",
+      "why": "What a consumer reads, and its shape and period dependency, decide the gold build.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "DataContract": {
+      "question": "What does each output promise: its dataset, layer and fields, the entity it joins, its contract's version, keys and change policy?",
+      "why": "A consumer depends on a shape; a breaking change without a new version breaks it silently.",
+      "alternatives": "Reusing Interface as is, or a class unrelated to it: rejected for a kind of Interface (DECISIONS.md).",
+      "validated_by": ""
+    },
+    "DerivationRule": {
+      "question": "How is each derivation rule defined: its kind, logic, inputs, period dependency, the field it derives and its example?",
+      "why": "Each gold value is generated from its rule; ambiguity here becomes a wrong number in a published document.",
+      "alternatives": "The specification's name Rule: rejected, the report ontology declares Rule (DECISIONS.md).",
+      "validated_by": ""
+    },
+    "EdgeCase": {
+      "question": "What does each derivation rule do on each edge case it answers?",
+      "why": "A tie, a null, a short history are where generated code most often guesses; the behaviour is decided once.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "RuleExample": {
+      "question": "How is each derivation rule defined: its kind, logic, inputs, period dependency, the field it derives and its example?",
+      "why": "The unit test of a rule, worked out by someone other than the agent that writes the code.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "QualityRule": {
+      "question": "Which quality rules run at which gate, through which check, failing to whom?",
+      "why": "What stops a bad batch, and at which boundary; the gate's check is generated from it.",
+      "alternatives": "The report's QualityCheck: rejected, two levels with no overlap (DECISIONS.md).",
+      "validated_by": ""
+    },
+    "Tolerance": {
+      "question": "How is each conformed entity resolved: its dataset and grain, each source's identity mapping, its scope and tolerance, its history?",
+      "why": "A count or a figure is never exact by accident; who set the tolerance is who answers for it.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "FailureAction": {
+      "question": "Which quality rules run at which gate, through which check, failing to whom?",
+      "why": "A failed gate without a named person and runbook waits until someone notices.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "Identity": {
+      "question": "Which identities run the pipeline or read it, in which environment, with which access?",
+      "why": "Access is generated per environment; the rule that no person writes silver or gold is checked on it.",
+      "alternatives": "",
+      "validated_by": ""
+    }
+  },
+  "properties": {
+    "delivered_by": {
+      "question": "delivered by",
+      "why": "A table's system decides its access method and who owns it.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "has_key": {
+      "question": "has key",
+      "why": "The keys are what uniqueness is checked on at gate 1 and what identity mappings read.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "date_column": {
+      "question": "date column",
+      "why": "The period slice filters on it; without it the copy cannot select a period.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "has_column": {
+      "question": "has column",
+      "why": "What the pipeline reads, and nothing else, so an unused column never reaches bronze.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "copied_by": {
+      "question": "copied by",
+      "why": "Every source table has exactly one way into bronze (MD4, MD17).",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "watermark": {
+      "question": "watermark",
+      "why": "An incremental copy needs the column that says what is new.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "stewarded_by": {
+      "question": "stewarded by",
+      "why": "Someone answers for a source table, a term, a code set, a quality rule; ownership sits on a role.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "carries_term": {
+      "question": "carries term",
+      "why": "A field means a business term, not a column name; lineage and labels follow the term.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "term_code_set": {
+      "question": "code set",
+      "why": "A term with a list of values is checked against it.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "maps_column": {
+      "question": "maps column",
+      "why": "The mapping applies to one source column.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "maps_to": {
+      "question": "maps to",
+      "why": "The mapping produces one business term, which every silver field carrying that term is then checked against.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "of_code_set": {
+      "question": "of code set",
+      "why": "A source value maps into one code set, so the gate-2 check (in_set) knows which values are allowed.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "from_system": {
+      "question": "from system",
+      "why": "The same value means different things in different systems.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "has_identity_mapping": {
+      "question": "has identity mapping",
+      "why": "One mapping per source that delivers the entity (MD7).",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "scoped_by": {
+      "question": "scoped by",
+      "why": "The scope decides which instances gate 2 counts.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "keeps_history": {
+      "question": "keeps history",
+      "why": "The silver build differs by history policy.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "materialised_as": {
+      "question": "materialised as",
+      "why": "An entity or an output is one physical table, which its step writes.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "from_table": {
+      "question": "from table",
+      "why": "One identity mapping per source table: the same entity is spelled differently in each source that delivers it.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "id_column": {
+      "question": "id column",
+      "why": "The columns that hold the id in that source.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "target_key": {
+      "question": "target key",
+      "why": "The key fields of the entity the id becomes.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "within_tolerance": {
+      "question": "within tolerance",
+      "why": "How far off a count or a figure may be before the gate fails.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "grain": {
+      "question": "grain",
+      "why": "One row per what: uniqueness is checked on it and an output's keys come from it.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "has_field": {
+      "question": "has field",
+      "why": "A dataset's fields are what its contract promises and its consumers read.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "bound_to": {
+      "question": "bound to",
+      "why": "A field whose values come from a code set is checked against it at gate 2.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "derived_by": {
+      "question": "derived by",
+      "why": "A computed field names the rule that computes it, so the code is generated from the rule.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "fed_by": {
+      "question": "fed by",
+      "why": "A copied field names what it is copied from; changes upstream reach it through this.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "output_of": {
+      "question": "output of",
+      "why": "An output belongs to one data product, whose period and freshness it follows.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "joins_to": {
+      "question": "joins to",
+      "why": "An output is keyed on a silver entity; coverage (every in-scope entity has a row) is checked through it.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "reads_output": {
+      "question": "reads output",
+      "why": "Who reads an output, beside the systems that consume its contract.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "contract_of": {
+      "question": "contract of",
+      "why": "A contract promises the shape of one dataset.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "rule_input": {
+      "question": "rule input",
+      "why": "A rule's inputs sit in the same or a lower layer (refused otherwise).",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "has_edge_case": {
+      "question": "has edge case",
+      "why": "The behaviour on each standard edge case is decided, not guessed by generated code (MD12).",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "has_example": {
+      "question": "has example",
+      "why": "Every rule has an example its unit test is made from (MD11).",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "targets": {
+      "question": "targets",
+      "why": "What a quality rule checks, by dataset or field, so the gate's check is generated against the right table.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "failure_action": {
+      "question": "failure action",
+      "why": "A failed rule with no recorded action waits until someone notices, and the batch's consumers read what it let through.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "carried_out_by": {
+      "question": "carried out by",
+      "why": "The design rule and the check that runs it at its gate are tied, so a gate with no hard rule shows (MD15).",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "set_by": {
+      "question": "set by",
+      "why": "Who set a tolerance answers for it when a batch passes a gate it should not have, or fails one it should have passed.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "notifies": {
+      "question": "notifies",
+      "why": "A failure is somebody's to handle: the role told is the role that answers for the rule at its gate.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "follows_runbook": {
+      "question": "follows runbook",
+      "why": "The notified role follows a written recovery, so a failure at night is handled the way it was decided by day.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "executes": {
+      "question": "executes",
+      "why": "Each step of the flow runs one piece of the design; coverage and the single executor are checked through it (MD16, MD17).",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "represents": {
+      "question": "represents",
+      "why": "The flow's tables are the design's datasets; their layers must agree.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "in_environment": {
+      "question": "in environment",
+      "why": "Access is granted per environment, so an identity's rights in development never reach production.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "runs_flow": {
+      "question": "runs flow",
+      "why": "A flow runs as a service identity, never as a person, so who changed the data is always the pipeline.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "resumes_from": {
+      "question": "resumes from",
+      "why": "A recovery names the step it resumes from, so the runbook stays true when the flow changes.",
+      "alternatives": "",
+      "validated_by": ""
+    }
+  }
+}

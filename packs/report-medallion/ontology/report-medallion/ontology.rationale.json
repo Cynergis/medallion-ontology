@@ -1,0 +1,24 @@
+{
+  "_about": "Why each relation exists. `validated_by` is empty until confirmed.",
+  "classes": {},
+  "properties": {
+    "is_dataset": {
+      "question": "Which report columns are which gold dataset fields, and where does each field come from?",
+      "alternatives": "",
+      "validated_by": "",
+      "why": "A report reads a table its pipeline builds; without the link its lineage stops at the report."
+    },
+    "is_field": {
+      "question": "Which report columns are which gold dataset fields, and where does each field come from?",
+      "alternatives": "",
+      "validated_by": "",
+      "why": "A report's value is traced to the gold field, and from there to the rule or the source behind it."
+    },
+    "backed_by": {
+      "question": "Which report quality checks rely on which pipeline quality rules, at which gate?",
+      "alternatives": "",
+      "validated_by": "",
+      "why": "Two levels, no overlap: a report check that relies on a pipeline rule says so, instead of checking the data again."
+    }
+  }
+}

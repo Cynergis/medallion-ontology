@@ -1,0 +1,890 @@
+{
+  "_about": "The medallion pipeline: its batch flow on the flow's terms (release 1) and its design (release 2): the classes of the specification's steps D1 to D7 and D9, and how the flow executes them. Names follow DECISIONS.md.",
+  "_summary": "A medallion data pipeline, source systems to bronze, silver and gold: its sources, reference data, conformed entities, gold outputs and contracts, derivation and quality rules, build plan, and the batch flow that executes them, with the rules a design and a declared flow must satisfy.",
+  "name": "Medallion pipeline",
+  "ontology_version": 1,
+  "strict_domains": false,
+  "languages": [
+    "en"
+  ],
+  "classes": {
+    "SourceSystem": {
+      "subclass_of": [
+        "System"
+      ],
+      "definition": "A system the pipeline reads from, and how: its kind, the access method, whether filters may run on its side (D2)."
+    },
+    "SourceTable": {
+      "definition": "One table or feed of a source system, with its contract: keys, the column a row's date is in, how it changes over time and the evidence for it, when it arrives (D2)."
+    },
+    "SourceColumn": {
+      "definition": "A column of a source table: its name, source type, nullability and unit, and the business term it carries (D2, D3)."
+    },
+    "CopyPolicy": {
+      "definition": "How a source table reaches bronze: a period slice, new rows by watermark, an as-of read or a change feed; the lookback, the source-side filter, the retention (D2)."
+    },
+    "TermMapping": {
+      "definition": "How a source column becomes a business term: the transform from the source form to the canonical one (D3)."
+    },
+    "CodeSet": {
+      "definition": "A list of allowed values with their labels per published language (D3)."
+    },
+    "CodeMapping": {
+      "definition": "Which value of a source system means which canonical value of a code set (D3)."
+    },
+    "ConformedEntity": {
+      "definition": "A silver business entity, resolved once across sources: its grain, how each source's id maps to its key, which instances are in scope, how history is kept, the table it is materialised as (D4). The specification's Entity, renamed (DECISIONS.md)."
+    },
+    "IdentityMapping": {
+      "definition": "How one source table's id becomes the conformed key: the id columns, their transform, the target key fields (D4)."
+    },
+    "ScopeRule": {
+      "definition": "Which instances of an entity are in scope, how many there should be, by whose count, and how far off the count may be (D4)."
+    },
+    "HistoryPolicy": {
+      "definition": "Whether an entity keeps history, and how: none, a snapshot per batch, or validity ranges (D4)."
+    },
+    "Dataset": {
+      "subclass_of": [
+        "DataStore"
+      ],
+      "definition": "A physical table or view of the pipeline, in one layer, with its grain, partitioning and fields (D4, D5). The specification's Table, renamed; a kind of DataStore, so it runs in an environment and has an owner."
+    },
+    "DatasetField": {
+      "definition": "A field of a dataset: its type, whether it is required, the business term it carries, and either the rule that derives it or what feeds it (D4, D5). The specification's Field, renamed."
+    },
+    "Output": {
+      "definition": "A gold dataset a consumer reads: its shape, the silver entity it is keyed on, whether it needs a window of periods, the data product it belongs to (D5)."
+    },
+    "DataContract": {
+      "subclass_of": [
+        "Interface"
+      ],
+      "definition": "A versioned shape of a dataset others depend on: its fields, keys and change policy (D5). A kind of Interface: consumers consume it, a version supersedes the one before it, it has an owner."
+    },
+    "DerivationRule": {
+      "definition": "How one field is produced, or rows are filtered: its kind, its logic as a pattern of the vocabulary, its inputs, its behaviour on the standard edge cases, and an example (D6). The specification's Rule, renamed."
+    },
+    "EdgeCase": {
+      "definition": "What a derivation rule does on one edge case: a tie, a null input, missing history, an entity younger than the lookback, a duplicate input (D6)."
+    },
+    "RuleExample": {
+      "definition": "One real input and the output a derivation rule must give for it, worked out by someone other than the generating agent (D6)."
+    },
+    "QualityRule": {
+      "definition": "What must be true of the data at one gate (1 landing to bronze, 2 bronze to silver, 3 silver to gold): its targets, its assertion, hard or soft, its tolerance, what happens when it fails, a row that should fail it (D7). Carried out by a flow check on the gate's step."
+    },
+    "Tolerance": {
+      "definition": "How far off a count or a figure may be, in which unit, set by whom (D4, D7)."
+    },
+    "FailureAction": {
+      "definition": "What happens when a quality rule fails: who is told, which runbook they follow, whether the step retries (D7)."
+    },
+    "Identity": {
+      "definition": "A principal the pipeline runs as or a person who reads it: its kind, the environment, its access to datasets (D9)."
+    }
+  },
+  "properties": {
+    "delivered_by": {
+      "domain": "SourceTable",
+      "range": "SourceSystem",
+      "inverse": "delivers",
+      "label": "delivered by",
+      "definition": "The system the table comes from.",
+      "max": 1
+    },
+    "has_key": {
+      "domain": "SourceTable",
+      "range": "SourceColumn",
+      "inverse": "key_of",
+      "label": "has key",
+      "definition": "A column that identifies a row of the table."
+    },
+    "date_column": {
+      "domain": "SourceTable",
+      "range": "SourceColumn",
+      "inverse": "date_column_of",
+      "label": "date column",
+      "definition": "The column that says what date a row is about.",
+      "max": 1
+    },
+    "has_column": {
+      "domain": "SourceTable",
+      "range": "SourceColumn",
+      "inverse": "column_of",
+      "label": "has column",
+      "definition": "A column the pipeline reads from the table."
+    },
+    "copied_by": {
+      "domain": "SourceTable",
+      "range": "CopyPolicy",
+      "inverse": "copies",
+      "label": "copied by",
+      "definition": "How the table reaches bronze.",
+      "max": 1
+    },
+    "watermark": {
+      "domain": "CopyPolicy",
+      "range": "SourceColumn",
+      "inverse": "watermark_of",
+      "label": "watermark",
+      "definition": "For an incremental copy: the column that is the watermark.",
+      "max": 1
+    },
+    "stewarded_by": {
+      "domain": "SourceTable|Term|CodeSet|QualityRule",
+      "range": "Role",
+      "inverse": "stewards",
+      "label": "stewarded by",
+      "definition": "The role that answers for it: who answers questions about a source table, defines a term, owns a code set or a quality rule."
+    },
+    "carries_term": {
+      "domain": "SourceColumn|DatasetField",
+      "range": "Term",
+      "inverse": "term_of",
+      "label": "carries term",
+      "definition": "The business term a column or a field carries.",
+      "max": 1
+    },
+    "term_code_set": {
+      "domain": "Term",
+      "range": "CodeSet",
+      "inverse": "lists_values_of",
+      "label": "code set",
+      "definition": "The list a term takes its values from.",
+      "max": 1
+    },
+    "maps_column": {
+      "domain": "TermMapping",
+      "range": "SourceColumn",
+      "inverse": "mapped_by",
+      "label": "maps column",
+      "definition": "The source column a term mapping reads.",
+      "max": 1
+    },
+    "maps_to": {
+      "domain": "TermMapping",
+      "range": "Term",
+      "inverse": "mapped_from",
+      "label": "maps to",
+      "definition": "The business term a term mapping produces.",
+      "max": 1
+    },
+    "of_code_set": {
+      "domain": "CodeMapping",
+      "range": "CodeSet",
+      "inverse": "has_code_mapping",
+      "label": "of code set",
+      "definition": "The code set a code mapping maps into.",
+      "max": 1
+    },
+    "from_system": {
+      "domain": "CodeMapping",
+      "range": "SourceSystem",
+      "inverse": "code_mapping_of",
+      "label": "from system",
+      "definition": "The source system whose value a code mapping maps.",
+      "max": 1
+    },
+    "has_identity_mapping": {
+      "domain": "ConformedEntity",
+      "range": "IdentityMapping",
+      "inverse": "identity_mapping_of",
+      "label": "has identity mapping",
+      "definition": "How one source's id becomes the entity's key."
+    },
+    "scoped_by": {
+      "domain": "ConformedEntity",
+      "range": "ScopeRule",
+      "inverse": "scopes",
+      "label": "scoped by",
+      "definition": "Which instances of the entity count.",
+      "max": 1
+    },
+    "keeps_history": {
+      "domain": "ConformedEntity",
+      "range": "HistoryPolicy",
+      "inverse": "history_of",
+      "label": "keeps history",
+      "definition": "How the entity keeps history.",
+      "max": 1
+    },
+    "materialised_as": {
+      "domain": "ConformedEntity|Output",
+      "range": "Dataset",
+      "inverse": "materialises",
+      "label": "materialised as",
+      "definition": "The table an entity or an output is.",
+      "max": 1
+    },
+    "from_table": {
+      "domain": "IdentityMapping",
+      "range": "SourceTable",
+      "inverse": "mapped_in",
+      "label": "from table",
+      "definition": "The source table whose id an identity mapping maps.",
+      "max": 1
+    },
+    "id_column": {
+      "domain": "IdentityMapping",
+      "range": "SourceColumn",
+      "inverse": "id_column_of",
+      "label": "id column",
+      "definition": "A column that holds the source id."
+    },
+    "target_key": {
+      "domain": "IdentityMapping",
+      "range": "DatasetField",
+      "inverse": "keyed_by",
+      "label": "target key",
+      "definition": "A key field of the entity the source id maps to."
+    },
+    "within_tolerance": {
+      "domain": "ScopeRule|QualityRule",
+      "range": "Tolerance",
+      "inverse": "tolerance_of",
+      "label": "within tolerance",
+      "definition": "How far off a count or a figure may be.",
+      "max": 1
+    },
+    "grain": {
+      "domain": "ConformedEntity|Dataset|Output",
+      "range": "DatasetField",
+      "inverse": "grain_of",
+      "label": "grain",
+      "definition": "A field of the grain: one row per what."
+    },
+    "has_field": {
+      "domain": "Dataset",
+      "range": "DatasetField",
+      "inverse": "field_of",
+      "label": "has field",
+      "definition": "A field of the dataset."
+    },
+    "bound_to": {
+      "domain": "DatasetField",
+      "range": "CodeSet",
+      "inverse": "binds",
+      "label": "bound to",
+      "definition": "The code set a field's values come from.",
+      "max": 1
+    },
+    "derived_by": {
+      "domain": "DatasetField",
+      "range": "DerivationRule",
+      "inverse": "derives",
+      "label": "derived by",
+      "definition": "The rule that computes the field.",
+      "max": 1
+    },
+    "fed_by": {
+      "domain": "DatasetField",
+      "range": "SourceColumn|DatasetField",
+      "inverse": "feeds",
+      "label": "fed by",
+      "definition": "What a copied field comes from. If this changes, what is fed by it is affected, transitively."
+    },
+    "output_of": {
+      "domain": "Output",
+      "range": "Product",
+      "inverse": "has_output",
+      "label": "output of",
+      "definition": "The data product the output belongs to.",
+      "max": 1
+    },
+    "joins_to": {
+      "domain": "Output",
+      "range": "ConformedEntity",
+      "inverse": "joined_by",
+      "label": "joins to",
+      "definition": "The silver entity the output is keyed on.",
+      "max": 1
+    },
+    "reads_output": {
+      "domain": "Role|Persona",
+      "range": "Output",
+      "inverse": "read_by_role",
+      "label": "reads output",
+      "definition": "A role or a persona who reads the output; a tool, an API or a downstream pipeline is a System that consumes its contract."
+    },
+    "contract_of": {
+      "domain": "DataContract",
+      "range": "Dataset",
+      "inverse": "has_contract",
+      "label": "contract of",
+      "definition": "The dataset whose shape the contract promises.",
+      "max": 1
+    },
+    "rule_input": {
+      "domain": "DerivationRule",
+      "range": "DatasetField|SourceColumn",
+      "inverse": "input_to",
+      "label": "rule input",
+      "definition": "A field or a column the rule reads."
+    },
+    "has_edge_case": {
+      "domain": "DerivationRule",
+      "range": "EdgeCase",
+      "inverse": "edge_case_of",
+      "label": "has edge case",
+      "definition": "The rule's behaviour on one edge case."
+    },
+    "has_example": {
+      "domain": "DerivationRule",
+      "range": "RuleExample",
+      "inverse": "example_of",
+      "label": "has example",
+      "definition": "An example that proves the rule."
+    },
+    "targets": {
+      "domain": "QualityRule",
+      "range": "Dataset|DatasetField",
+      "inverse": "targeted_by",
+      "label": "targets",
+      "definition": "A dataset or a field the rule checks."
+    },
+    "failure_action": {
+      "domain": "QualityRule",
+      "range": "FailureAction",
+      "inverse": "action_for",
+      "label": "failure action",
+      "definition": "What happens when the rule fails.",
+      "max": 1
+    },
+    "carried_out_by": {
+      "domain": "QualityRule",
+      "range": "Check",
+      "inverse": "carries_out",
+      "label": "carried out by",
+      "definition": "The flow check, on its gate's step, that runs the rule."
+    },
+    "set_by": {
+      "domain": "Tolerance",
+      "range": "Role",
+      "inverse": "sets_tolerance",
+      "label": "set by",
+      "definition": "The role that set the tolerance.",
+      "max": 1
+    },
+    "notifies": {
+      "domain": "FailureAction",
+      "range": "Role",
+      "inverse": "notified_by",
+      "label": "notifies",
+      "definition": "The role told when the rule fails."
+    },
+    "follows_runbook": {
+      "domain": "FailureAction",
+      "range": "Runbook",
+      "inverse": "runbook_for",
+      "label": "follows runbook",
+      "definition": "The runbook the notified role follows.",
+      "max": 1
+    },
+    "executes": {
+      "domain": "Step",
+      "range": "CopyPolicy|ConformedEntity|Output|DerivationRule",
+      "inverse": "executed_by",
+      "label": "executes",
+      "definition": "What a step of a medallion flow runs: a copy policy, an entity's build, an output's build, a derivation rule. The specification's Transformation is the step itself (DECISIONS.md)."
+    },
+    "represents": {
+      "domain": "Artifact",
+      "range": "Dataset|SourceTable",
+      "inverse": "represented_by",
+      "label": "represents",
+      "definition": "The design table an artifact of the flow is: a dataset, or a source table.",
+      "max": 1
+    },
+    "in_environment": {
+      "domain": "Identity",
+      "range": "Environment",
+      "inverse": "hosts_identity",
+      "label": "in environment",
+      "definition": "The environment an identity belongs to.",
+      "max": 1
+    },
+    "runs_flow": {
+      "domain": "Identity",
+      "range": "Flow",
+      "inverse": "run_by",
+      "label": "runs flow",
+      "definition": "A flow the identity runs."
+    },
+    "resumes_from": {
+      "domain": "Runbook",
+      "range": "Step",
+      "inverse": "resumed_by",
+      "label": "resumes from",
+      "definition": "The step a recovery resumes the flow from."
+    }
+  },
+  "attributes": {
+    "Artifact": {
+      "layer": {
+        "type": "enum:source|bronze|silver|gold|control",
+        "label": "layer",
+        "definition": "The layer a table of the pipeline sits in: a source read from outside, bronze (copied as is), silver (conformed), gold (what consumers read), or control (the batch's own records)."
+      }
+    },
+    "Step": {
+      "gate": {
+        "type": "integer",
+        "label": "gate",
+        "definition": "For a run_gate step, the boundary it checks: 1 landing to bronze, 2 bronze to silver, 3 silver to gold."
+      }
+    },
+    "Product": {
+      "period_kind": {
+        "type": "enum:daily|weekly|monthly|quarterly|annual|event",
+        "label": "period kind",
+        "definition": "How often a period of the data product closes."
+      },
+      "period_end_rule": {
+        "type": "string",
+        "label": "period end rule",
+        "definition": "What date ends a period: calendar_month_end, last_business_day, fixed_day: N, or event."
+      },
+      "freshness_sla": {
+        "type": "string",
+        "label": "freshness SLA",
+        "definition": "By when, after the period ends, gold must be ready (a duration)."
+      }
+    },
+    "Term": {
+      "data_type": {
+        "type": "string",
+        "label": "data type",
+        "definition": "The canonical type of the term's values."
+      },
+      "unit": {
+        "type": "string",
+        "label": "unit",
+        "definition": "The canonical unit, when the term is a quantity (percent, fraction, cents…)."
+      }
+    },
+    "SourceSystem": {
+      "source_kind": {
+        "type": "enum:rdbms|warehouse|file_drop|api|event_stream",
+        "label": "source kind",
+        "definition": "What kind of system the source is."
+      },
+      "access_method": {
+        "type": "enum:direct_query|extract_file|change_feed|api_pull",
+        "label": "access method",
+        "definition": "How the pipeline reads it."
+      },
+      "source_side_logic_allowed": {
+        "type": "boolean",
+        "label": "source-side logic allowed",
+        "definition": "Whether filters may run on the source side; never business logic."
+      }
+    },
+    "SourceTable": {
+      "schema": {
+        "type": "string",
+        "label": "schema",
+        "definition": "The schema, as the source names it."
+      },
+      "table_name": {
+        "type": "string",
+        "label": "table name",
+        "definition": "The table or feed name, as the source names it."
+      },
+      "change_behaviour": {
+        "type": "enum:historized|append_only|overwritten|manual_reload",
+        "label": "change behaviour",
+        "definition": "How the table changes over time."
+      },
+      "change_behaviour_evidence": {
+        "type": "string",
+        "label": "change behaviour evidence",
+        "definition": "What proves the change behaviour: a drift measurement or the owner's statement."
+      },
+      "expected_at_period_end": {
+        "type": "boolean",
+        "label": "expected at period end",
+        "definition": "Whether it must have rows for the period end before a batch runs."
+      },
+      "delivery_lag": {
+        "type": "string",
+        "label": "delivery lag",
+        "definition": "How long after the period end it arrives (a duration)."
+      }
+    },
+    "SourceColumn": {
+      "column_name": {
+        "type": "string",
+        "label": "column name",
+        "definition": "The column name, as the source names it."
+      },
+      "source_type": {
+        "type": "string",
+        "label": "source type",
+        "definition": "The column's type in the source."
+      },
+      "nullable": {
+        "type": "boolean",
+        "label": "nullable",
+        "definition": "Whether it can be null."
+      },
+      "unit": {
+        "type": "string",
+        "label": "unit",
+        "definition": "For a number: its unit in the source (percent, fraction, cents…)."
+      },
+      "sample_values": {
+        "type": "list",
+        "label": "sample values",
+        "definition": "Three real values, for the fixtures."
+      }
+    },
+    "CopyPolicy": {
+      "method": {
+        "type": "enum:full_period_slice|incremental_by_watermark|as_of_read|cdc_apply",
+        "label": "method",
+        "definition": "How rows reach bronze.",
+        "required": true
+      },
+      "lookback": {
+        "type": "string",
+        "label": "lookback",
+        "definition": "How far before the period end rows are needed (a duration)."
+      },
+      "source_side_filter": {
+        "type": "string",
+        "label": "source-side filter",
+        "definition": "The filter that runs on the source, if any: date_between(period_end - lookback, period_end)."
+      },
+      "retention_hot": {
+        "type": "string",
+        "label": "hot retention",
+        "definition": "How long bronze keeps it in hot storage."
+      },
+      "retention_cold": {
+        "type": "string",
+        "label": "cold retention",
+        "definition": "How long it is archived."
+      }
+    },
+    "TermMapping": {
+      "transform": {
+        "type": "string",
+        "label": "transform",
+        "definition": "From source form to canonical: identity, rename, trim, upper, lower, lpad: N, char, divide: N, multiply: N, to_date: format, to_utc: tz, code_map: set, coalesce: [a, b, default].",
+        "required": true
+      }
+    },
+    "CodeSet": {
+      "values": {
+        "type": "list",
+        "label": "values",
+        "definition": "The canonical values."
+      },
+      "labels": {
+        "type": "list",
+        "label": "labels",
+        "definition": "Each value's label in each published language, as value@language: label."
+      }
+    },
+    "CodeMapping": {
+      "source_value": {
+        "type": "string",
+        "label": "source value",
+        "definition": "The value as the source system writes it.",
+        "required": true
+      },
+      "canonical_value": {
+        "type": "string",
+        "label": "canonical value",
+        "definition": "The code set's value it means.",
+        "required": true
+      }
+    },
+    "IdentityMapping": {
+      "transform": {
+        "type": "string",
+        "label": "transform",
+        "definition": "How the source id is normalised (a transform pattern).",
+        "required": true
+      },
+      "company_or_tenant_map": {
+        "type": "list",
+        "label": "company or tenant map",
+        "definition": "When a company or tenant code is part of the key: source=canonical pairs."
+      }
+    },
+    "ScopeRule": {
+      "conditions": {
+        "type": "list",
+        "label": "conditions",
+        "definition": "What makes an instance in scope: field operator value, with =, !=, in, not_in, is_null, is_not_null, exists_in."
+      },
+      "expected_count": {
+        "type": "integer",
+        "label": "expected count",
+        "definition": "How many instances there should be."
+      },
+      "count_as_of": {
+        "type": "date",
+        "label": "count as of",
+        "definition": "The date the expected count holds."
+      },
+      "count_source": {
+        "type": "string",
+        "label": "count source",
+        "definition": "Who or what says the count."
+      }
+    },
+    "HistoryPolicy": {
+      "history_kind": {
+        "type": "enum:none|snapshot_per_batch|scd2",
+        "label": "history kind",
+        "definition": "No history, one snapshot per batch, or validity ranges.",
+        "required": true
+      },
+      "valid_from_rule": {
+        "type": "string",
+        "label": "valid-from rule",
+        "definition": "For scd2: how a range's start is derived."
+      },
+      "valid_to_rule": {
+        "type": "string",
+        "label": "valid-to rule",
+        "definition": "For scd2: how a range's end is derived."
+      }
+    },
+    "Dataset": {
+      "layer": {
+        "type": "enum:bronze|silver|gold|control",
+        "label": "layer",
+        "definition": "The layer the dataset is in.",
+        "required": true
+      },
+      "dataset_kind": {
+        "type": "enum:table|view",
+        "label": "dataset kind",
+        "definition": "A physical table or a view."
+      },
+      "partition_by": {
+        "type": "string",
+        "label": "partition by",
+        "definition": "The partition key: batch_id for the data layers."
+      },
+      "cluster_by": {
+        "type": "list",
+        "label": "cluster by",
+        "definition": "The fields it is clustered by."
+      }
+    },
+    "DatasetField": {
+      "data_type": {
+        "type": "string",
+        "label": "data type",
+        "definition": "The field's type."
+      },
+      "required": {
+        "type": "boolean",
+        "label": "required",
+        "definition": "Whether every row has a value."
+      }
+    },
+    "Output": {
+      "shape": {
+        "type": "enum:long|wide",
+        "label": "shape",
+        "definition": "Long (one row per key, dimension and value) unless the consumer cannot read long.",
+        "required": true
+      },
+      "shape_rationale": {
+        "type": "string",
+        "label": "shape rationale",
+        "definition": "Why wide, when it is."
+      },
+      "period_dependency": {
+        "type": "enum:point_in_time|lookback",
+        "label": "period dependency",
+        "definition": "Whether it needs only the period or a window."
+      },
+      "lookback": {
+        "type": "string",
+        "label": "lookback",
+        "definition": "How far back, when it needs a window."
+      },
+      "needs_history": {
+        "type": "boolean",
+        "label": "needs history",
+        "definition": "Whether a consumer reads past periods, not only the current one."
+      }
+    },
+    "DataContract": {
+      "version": {
+        "type": "string",
+        "label": "version",
+        "definition": "The contract's version label.",
+        "required": true
+      },
+      "contract_fields": {
+        "type": "list",
+        "label": "fields",
+        "definition": "The promised fields, in order, as name: type, required or optional."
+      },
+      "keys": {
+        "type": "list",
+        "label": "keys",
+        "definition": "The fields that identify a row."
+      },
+      "change_policy": {
+        "type": "enum:additive_only|versioned_breaking",
+        "label": "change policy",
+        "definition": "Whether columns may be added without a new version."
+      }
+    },
+    "DerivationRule": {
+      "rule_kind": {
+        "type": "enum:filter|derivation|ranking|aggregation|identity|pivot_in_publication_only",
+        "label": "rule kind",
+        "definition": "What kind of rule it is.",
+        "required": true
+      },
+      "logic": {
+        "type": "string",
+        "label": "logic",
+        "definition": "How, exactly: a pattern of the vocabulary (copy, rank_by, sum_by, latest_by, window_from_returns, ratio, std_dev_over, case, filter, join_lookup) with its parameters, or expression: <text> with reviewed_by."
+      },
+      "reviewed_by": {
+        "type": "string",
+        "label": "reviewed by",
+        "definition": "Who signed off a free-form expression."
+      },
+      "period_dependency": {
+        "type": "enum:none|point_in_time|lookback",
+        "label": "period dependency",
+        "definition": "Whether the rule depends on the period."
+      },
+      "lookback": {
+        "type": "string",
+        "label": "lookback",
+        "definition": "How far back, when it needs a window."
+      },
+      "specified_in": {
+        "type": "string",
+        "label": "specified in",
+        "definition": "The section of the specification the rule comes from."
+      }
+    },
+    "EdgeCase": {
+      "case": {
+        "type": "enum:tie|null_input|missing_history|younger_than_lookback|duplicate_input|out_of_range|other",
+        "label": "case",
+        "definition": "Which edge case.",
+        "required": true
+      },
+      "behaviour": {
+        "type": "string",
+        "label": "behaviour",
+        "definition": "What happens: exclude, include_as: value, error, first_by: field, last_by: field, carry_forward, or prose with reviewed_by.",
+        "required": true
+      }
+    },
+    "RuleExample": {
+      "inputs": {
+        "type": "string",
+        "label": "inputs",
+        "definition": "The input rows, or the fixture that holds them."
+      },
+      "expected_output": {
+        "type": "string",
+        "label": "expected output",
+        "definition": "The rows that must come out, or the fixture that holds them."
+      },
+      "computed_by": {
+        "type": "enum:person|independent_calculation|reference_output",
+        "label": "computed by",
+        "definition": "Who worked out the expected value; never the generating agent."
+      }
+    },
+    "QualityRule": {
+      "rule_id": {
+        "type": "string",
+        "label": "rule id",
+        "definition": "The rule's identifier, cited by the check that carries it out."
+      },
+      "gate": {
+        "type": "integer",
+        "label": "gate",
+        "definition": "The boundary it runs at: 1 landing to bronze, 2 bronze to silver, 3 silver to gold.",
+        "required": true
+      },
+      "assertion": {
+        "type": "string",
+        "label": "assertion",
+        "definition": "What must be true: a pattern (present_for_period, fresh, schema_matches, count_within, unique, not_null, in_set, mapped, references, count_equals, not_after, in_range, sum_to, change_within, covered, consistent, long_form) with its parameters, or expression: <predicate> with reviewed_by."
+      },
+      "severity": {
+        "type": "enum:hard|soft",
+        "label": "severity",
+        "definition": "Stop the batch, or warn.",
+        "required": true
+      },
+      "severity_rationale": {
+        "type": "string",
+        "label": "severity rationale",
+        "definition": "Why only warn, when soft."
+      },
+      "example_failure": {
+        "type": "string",
+        "label": "example failure",
+        "definition": "A row, or the fixture holding it, that should fail the rule."
+      },
+      "specified_in": {
+        "type": "string",
+        "label": "specified in",
+        "definition": "The section of the specification the rule comes from."
+      }
+    },
+    "Tolerance": {
+      "value": {
+        "type": "number",
+        "label": "value",
+        "definition": "How far off.",
+        "required": true
+      },
+      "tolerance_unit": {
+        "type": "enum:absolute|percent|count",
+        "label": "unit",
+        "definition": "In which unit.",
+        "required": true
+      },
+      "rationale": {
+        "type": "string",
+        "label": "rationale",
+        "definition": "Why this tolerance."
+      }
+    },
+    "FailureAction": {
+      "auto_retry": {
+        "type": "boolean",
+        "label": "auto retry",
+        "definition": "Whether the step retries by itself."
+      },
+      "max_retries": {
+        "type": "integer",
+        "label": "maximum retries",
+        "definition": "How many times, when it does."
+      }
+    },
+    "Identity": {
+      "identity_kind": {
+        "type": "enum:service|human",
+        "label": "identity kind",
+        "definition": "A service principal or a person."
+      },
+      "access": {
+        "type": "list",
+        "label": "access",
+        "definition": "Its access, as layer: mode (bronze: read, silver: write…)."
+      }
+    }
+  }
+}
