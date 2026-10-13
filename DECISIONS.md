@@ -62,5 +62,5 @@ Decided by Chiheb Dkhil.
   invented. *Why:* the specification's "a step cannot close with a proposed instance in it", on the
   gates the engine already has.
 
-Decided by Chiheb Dkhil.
-
+The bridge's own pack decided by Chiheb Dkhil; the view's place and the checkpoint rule proposed
+with the packs, confirmed by merging them.
