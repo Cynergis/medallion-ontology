@@ -65,9 +65,9 @@ field behind it, a report's `QualityCheck` is `backed_by` the pipeline rule it r
 reads gold and a column is a field of its table's dataset (refused otherwise); a read dataset has a
 contract (a warning). RM1 is a report value's lineage, RM2 the checks a report relies on.
 
-It needs the report ontology at release 5, which composes `QualityCheck`; its tests run where that
-release is on the machine (`REPORT_ONTOLOGY`, default `~/.oto/ontologies/report`) and are skipped
-in CI until it is published.
+It needs the report ontology at release 5, which composes `QualityCheck`: `oto/report` in
+[Cynergis/report-ontology](https://github.com/Cynergis/report-ontology), which CI checks out beside
+`flow` (`REPORT_ONTOLOGY`, default `../report-ontology/oto/report`).
 
 Next: the `medallion` pack, with a pipeline-design skill walking D1–D9 checkpoint by checkpoint
 and a lineage view.

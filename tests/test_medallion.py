@@ -9,7 +9,7 @@
 
 Needs the engine (oto-kg, 0.11.7 or later), the flow unit (release 2): FLOW_ONTOLOGY, default
 ../report-ontology/oto/flow; and for the bridge, the report ontology (release 5): REPORT_ONTOLOGY,
-default ~/.oto/ontologies/report. The bridge's tests are skipped when it is absent."""
+default ../report-ontology/oto/report, else ~/.oto/ontologies/report. The bridge's tests are skipped when it is absent."""
 import copy
 import io
 import json
@@ -26,7 +26,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UNITS = os.path.join(ROOT, "ontology")
 UNIT = os.path.join(UNITS, "medallion")
 FLOW = os.environ.get("FLOW_ONTOLOGY") or os.path.join(os.path.dirname(ROOT), "report-ontology", "oto", "flow")
-REPORT = os.environ.get("REPORT_ONTOLOGY") or os.path.expanduser("~/.oto/ontologies/report")
+REPORT = os.environ.get("REPORT_ONTOLOGY") or next(
+    (p for p in (os.path.join(os.path.dirname(ROOT), "report-ontology", "oto", "report"), os.path.expanduser("~/.oto/ontologies/report"))
+     if os.path.exists(os.path.join(p, "manifest.json"))), "")
 
 
 def _release(path):

@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: The flow unit (report-ontology, oto/flow)
+      - name: The flow and report units (report-ontology, oto/flow and oto/report)
         uses: actions/checkout@v4
         with:
           repository: Cynergis/report-ontology
@@ -26,4 +26,5 @@ jobs:
       - name: Tests
         env:
           FLOW_ONTOLOGY: report-ontology/oto/flow
+          REPORT_ONTOLOGY: report-ontology/oto/report
         run: python -m pytest -q tests
