@@ -13,7 +13,7 @@
     "commit": "17382e8",
     "embedded_at": "2026-10-13"
   },
-  "engine": ">=0.11.8",
+  "engine": ">=0.11.14",
   "maintainer": "Cynergis",
   "changelog": [
     {
