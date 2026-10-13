@@ -1,0 +1,21 @@
+{
+  "_about": "The report ontology's sample table read as the medallion sample's gold holdings: two columns, two fields.",
+  "nodes": [],
+  "edges": [
+    {
+      "from": "table.warehouse.reports.fund_profile_balanced",
+      "rel": "is_dataset",
+      "to": "dataset.gold.portfolio_holdings"
+    },
+    {
+      "from": "table.warehouse.reports.fund_profile_balanced.fund_id",
+      "rel": "is_field",
+      "to": "field.gold.portfolio_holdings.fund_id"
+    },
+    {
+      "from": "table.warehouse.reports.fund_profile_balanced.holdings_top_pct",
+      "rel": "is_field",
+      "to": "field.gold.portfolio_holdings.holding_pct"
+    }
+  ]
+}

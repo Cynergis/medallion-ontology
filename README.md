@@ -31,24 +31,62 @@ Questions: MD1 (the steps of each medallion flow, their kinds, groups and layers
 gates and their checks). The sample is the specification's worked fund-profile flow (section 7),
 with neutral source names.
 
-Next slices: the design classes of steps D1–D7 and D9 (sources, reference data, conformed
-entities, gold outputs and contracts, transformation rules, quality rules, the build plan), the
-coverage rules that tie the flow to them (every source copied, every entity and output built),
-and a `medallion` pack with a pipeline-design skill and a lineage view.
+## The design (release 2)
+
+The classes of the specification's steps D1–D7 and D9, named as decided in
+[DECISIONS.md](DECISIONS.md), on what `product` and `software-architecture` already hold:
+
+| Step | Here |
+|---|---|
+| D1 data product, consumers | `Product` (+ period kind, period end rule, freshness SLA); consumers are roles, personas, or systems that consume a contract |
+| D2 sources | `SourceSystem` (a kind of `System`), `SourceTable`, `SourceColumn`, `CopyPolicy` |
+| D3 reference data | `Term` (+ data type, unit), `TermMapping`, `CodeSet`, `CodeMapping` |
+| D4 conformed model | `ConformedEntity`, `IdentityMapping`, `ScopeRule`, `HistoryPolicy`, `Dataset` (a kind of `DataStore`), `DatasetField` |
+| D5 gold outputs | `Output`, `DataContract` (a kind of `Interface`) |
+| D6 rules | `DerivationRule`, `EdgeCase`, `RuleExample` |
+| D7 quality | `QualityRule` (carried out by a flow `Check` on its gate's step), `Tolerance`, `FailureAction` |
+| D8 flow | a step `executes` the copy policy, entity, output or rule it runs; an artifact `represents` its dataset or source table |
+| D9 build plan | `Identity`; environments and runbooks are `software-architecture`'s, tests `flow`'s |
+
+**Correctness refuses, completeness reports.** A design that contradicts itself is refused at
+`oto curate check`: a field both derived and fed, a rule reading a higher layer than it writes, a
+step executing what its kind does not build, two steps executing one thing, an artifact in another
+layer than its dataset, an entity or output step not writing its table, a person writing silver or
+gold. What is missing is a gap, reported, not blocking, so a design fills group by group: the
+questions MD3 to MD17 must come back empty before a step's checkpoint (the specification's section
+5). The five standard edge cases of a rule are warnings. MD21 to MD29 are the catalogue a reviewer
+reads at each checkpoint.
+
+## The bridge: report-medallion
+
+`ontology/report-medallion` extends `report` and `medallion`, for a report product with a
+pipeline: a report's `Table` `is_dataset` the gold dataset it reads, a `Column` `is_field` the
+field behind it, a report's `QualityCheck` is `backed_by` the pipeline rule it relies on. A report
+reads gold and a column is a field of its table's dataset (refused otherwise); a read dataset has a
+contract (a warning). RM1 is a report value's lineage, RM2 the checks a report relies on.
+
+It needs the report ontology at release 5, which composes `QualityCheck`; its tests run where that
+release is on the machine (`REPORT_ONTOLOGY`, default `~/.oto/ontologies/report`) and are skipped
+in CI until it is published.
+
+Next: the `medallion` pack, with a pipeline-design skill walking D1–D9 checkpoint by checkpoint
+and a lineage view.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `ontology/medallion/` | The unit: manifest, vocabulary, rules, questions, rationale, sample, README. Written by `tools/build.py`; never edited by hand. |
-| `tools/build.py` | Writes the unit. Change it, run it, commit both. |
-| `tests/test_medallion.py` | The committed unit is what the build writes; it composes and its sample answers every question; the specification's flow is accepted and ten broken variants are each refused by the right rule. |
+| `ontology/medallion/`, `ontology/report-medallion/` | The two units: manifest, vocabulary, rules, questions, rationale, sample, README. Written by `tools/build.py`; never edited by hand. |
+| `tools/build.py`, `tools/design.py` | Write the units: the flow slice in the first, the design slice and the bridge in the second. Change them, run the build, commit both. |
+| `tests/test_medallion.py` | The committed units are what the build writes; both compose and their samples answer every question; the specification's worked instance is accepted, and twenty variants are each refused, flagged or reported as decided. |
+| `DECISIONS.md` | What was decided, by whom and when, and why: names, quality levels, contracts, the report link. |
 
 ## Use
 
 ```bash
-python tools/build.py                                     # write ontology/medallion
+python tools/build.py                                     # write ontology/medallion and ontology/report-medallion
 FLOW_ONTOLOGY=../report-ontology/oto/flow pytest -q tests  # needs oto-kg 0.11.7 or later
-oto ontology add <this repository> --path ontology/medallion   # install it on a machine
-oto init --empty --pack prd-architecture-studio --ontology product-report,ddd,medallion,flow --project <root>
+oto ontology add <this repository> --path ontology/medallion          # install them on a machine
+oto ontology add <this repository> --path ontology/report-medallion
+oto init --empty --pack prd-architecture-studio --ontology product-report,ddd,medallion,report-medallion,flow --project <root>
 ```

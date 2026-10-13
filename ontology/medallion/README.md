@@ -1,4 +1,4 @@
-# Medallion pipeline: the flow slice
+# Medallion pipeline
 
 Extends `software-architecture` (and so `product` and `portfolio`) and `flow`. A medallion data
 pipeline's batch run is plain `flow` data: steps that wait for each other, gates as steps with
@@ -23,3 +23,18 @@ parallel group shares no written artifact, no cycle of waits.
 Source: the Medallion Pipeline Ontology specification 1.2.0, sections 3.8.1 and 3.8.2. Not yet
 here, and next: the design classes of steps D1 to D7 and D9 (sources, reference data, entities,
 outputs, rules, quality rules, build plan) and the coverage rules that tie the flow to them.
+
+## The design (release 2)
+
+The classes of the specification's steps D1 to D7 and D9, named per DECISIONS.md, on what
+`product` and `software-architecture` already hold: a data product is a `Product`, a business term
+a `Term`, a source system a `SourceSystem` (a kind of `System`), a dataset a `Dataset` (a kind of
+`DataStore`, so it runs in an environment and has an owner), a contract a `DataContract` (a kind of
+`Interface`, so consumers consume it and versions supersede each other).
+
+A step of the flow `executes` the copy policy, entity, output or rule it runs, and an artifact of
+the flow `represents` its dataset or source table. A design that contradicts itself is refused at
+capture (a field both derived and fed, a rule reading a higher layer, a step executing what its kind
+does not build, two steps executing one thing, an artifact in another layer than its dataset, a
+person writing silver or gold). What is missing is a gap, reported and not blocking: the questions
+MD3 to MD17 must come back empty before a step's checkpoint, as the specification's section 5 lists.
