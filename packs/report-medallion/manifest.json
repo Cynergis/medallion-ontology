@@ -11,7 +11,7 @@
     "ref": null,
     "path": "ontology/report-medallion",
     "commit": "17382e8",
-    "embedded_at": "2026-10-13"
+    "embedded_at": "2026-10-14"
   },
   "engine": ">=0.11.8",
   "maintainer": "Cynergis",
