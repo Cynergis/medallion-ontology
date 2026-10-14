@@ -95,6 +95,16 @@ def test_with_the_bridge_the_lineage_view_shows_the_report_field_on_top(tmp_path
     pct = data["fields"]["field.gold.portfolio_holdings.holding_pct"]
     shown = [s for r in pct["report"] for s in r["shown_as"]]
     assert shown and all(s["report"] for s in shown)
+    assert all(s["id"].startswith("report.") for s in shown), "a report field carries its id, so it links to the report's page"
+
+
+def test_the_lineage_view_is_the_studios_page_of_where_the_data_comes_from():
+    app = json.load(open(os.path.join(LINEAGE, "app.json"), encoding="utf-8"))
+    assert app["place"] == "data" and app["title"] == "Where the data comes from" and "DatasetField" in app["shows"] and app["open"] == ["MD"]
+    page = open(os.path.join(LINEAGE, "index.html"), encoding="utf-8").read()
+    assert "../_studio/studio.js" in page and 'id="studio-open"' in page
+    for gone in ("(MD9)", "(MD11)", "(MD5)", "(D4, D5)", "rule_id", "<code>"):
+        assert gone not in page, gone
 
 
 @pytest.mark.parametrize("pack", ["medallion", "report-medallion"])
