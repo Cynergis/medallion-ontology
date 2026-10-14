@@ -48,8 +48,8 @@ document; if someone names a tool, record it as a decision of the architecture, 
 
 ## How each group is captured
 
-Run OTO's **capture-form** skill on the project's `capture.json`, with its menu at every
-confirmation ([A] elicit, [P] perspectives, [C] continue). A few related items at a time, in the
+Run OTO's **capture-form** skill on the project's `capture.json`, with its three choices at every read-back (save it and move on, dig deeper, see it from
+someone else's side). A few related items at a time, in the
 words of the person answering, never the ontology's; `kg_define <term>` when a term is unclear.
 Every confirmed group goes through the gates as a capture with `scope` the data product:
 
