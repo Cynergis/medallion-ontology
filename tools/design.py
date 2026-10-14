@@ -1,5 +1,6 @@
 """The design slice: the classes of the specification's steps D1 to D7 and D9, how they tie to the flow,
-and the bridge to the report ontology. Imported by build.py, which writes both units.
+the build plan's tests (release 3), and the bridge to the report ontology. Imported by build.py, which
+writes both units.
 
 Names follow DECISIONS.md: ConformedEntity, Dataset and DatasetField, DerivationRule; no Transformation
 class (a flow step `executes` the copy policy, entity, output or rule); DataContract is a kind of
@@ -48,6 +49,12 @@ def rel(domain, range_, inverse, label, definition, max_=None):
 
 
 LAYERS = "bronze|silver|gold|control"
+TEST_KINDS = ["unit", "contract", "parity", "rerun", "regression", "integration", "forced_failure", "flow"]
+#: what a test of each kind may exercise; a kind not listed may exercise any of them
+TEST_TARGETS = {"unit": "DerivationRule|QualityRule", "contract": "Output", "parity": "Output", "flow": "Flow",
+                "forced_failure": "QualityRule|Runbook"}
+TESTED = ["DerivationRule", "QualityRule", "Output", "Runbook", "Flow"]
+WORDS = {"DerivationRule": "a derivation rule", "QualityRule": "a quality rule", "Output": "an output", "Runbook": "a runbook", "Flow": "a flow"}
 
 CLASSES = {
     "SourceSystem": {"subclass_of": ["System"], "definition":
@@ -95,6 +102,10 @@ CLASSES = {
                                     "the step retries (D7)."},
     "Identity": {"definition": "A principal the pipeline runs as or a person who reads it: its kind, the environment, its "
                                "access to datasets (D9)."},
+    "PipelineTest": {"definition": "A test the build plan promises, and what it proves: its kind (unit, contract, parity, rerun, "
+                                   "regression, integration, forced failure, flow), the rule, output, runbook or flow it tests, "
+                                   "what it runs on and what must come out (D9). Not a flow TestObligation, which a step's checks "
+                                   "derive for its code (DECISIONS.md)."},
 }
 
 ATTRIBUTES = {
@@ -228,6 +239,17 @@ ATTRIBUTES = {
         "identity_kind": attr("enum:service|human", "identity kind", "A service principal or a person."),
         "access": attr("list", "access", "Its access, as layer: mode (bronze: read, silver: write…)."),
     },
+    "PipelineTest": {
+        "test_kind": attr("enum:" + "|".join(TEST_KINDS), "test kind",
+                          "unit (a rule on its example), contract (an output keeps its contract's shape), parity (an output matches "
+                          "what it replaces, or an independent calculation), rerun (a batch run twice writes the same rows), "
+                          "regression (what changed leaves past periods as they were), integration (the steps work together on real "
+                          "sources), forced_failure (a failure made on purpose stops the batch and its runbook recovers it), flow "
+                          "(the whole batch, in order, ends validated).", required=True),
+        "fixture": attr("string", "fixture", "What it runs on: input rows, a fixture file, a past period's batch, a reference output."),
+        "expected_result": attr("string", "expected result", "What must come out: rows or the fixture holding them, a figure within a "
+                                                             "tolerance, the step a batch stops at and who is told.", required=True),
+    },
 }
 
 PROPERTIES = {
@@ -290,6 +312,8 @@ PROPERTIES = {
     "in_environment": rel("Identity", "Environment", "hosts_identity", "in environment", "The environment an identity belongs to.", 1),
     "runs_flow": rel("Identity", "Flow", "run_by", "runs flow", "A flow the identity runs.", None),
     "resumes_from": rel("Runbook", "Step", "resumed_by", "resumes from", "The step a recovery resumes the flow from."),
+    "test_of": rel("PipelineTest", "|".join(TESTED), "tested_by", "test of",
+                   "What a test proves: a derivation rule, a quality rule, an output, a runbook or a flow."),
 }
 
 STANDARD_CASES = ["tie", "null_input", "missing_history", "younger_than_lookback", "duplicate_input"]
@@ -345,6 +369,14 @@ for step_kind, allowed in BUILD_KINDS.items():
                         flow_scope("s") + [node("s", "Step", {"stepKind": step_kind}), edge("s", "executes", "x"), node("x", "|".join(forbidden))],
                         "a %s step executes a %s" % (step_kind, " or ".join(forbidden)),
                         "A copy runs a copy policy, an entity step an entity and its rules, an output step an output and its rules (D8).", "MD16"))
+# the build plan's tests: a test of a kind exercises only what that kind can prove
+for test_kind, allowed in TEST_TARGETS.items():
+    forbidden = [c for c in TESTED if c not in allowed.split("|")]
+    words = " or ".join(WORDS[c] for c in allowed.split("|"))
+    RULES.append(policy("a-%s-test-tests-%s" % (test_kind.replace("_", "-"), "-or-".join(WORDS[c].replace(" ", "-") for c in allowed.split("|"))),
+                        [node("t", "PipelineTest", {"test_kind": test_kind}), edge("t", "test_of", "x"), node("x", "|".join(forbidden))],
+                        "a %s test is a test of something it cannot prove: it tests %s" % (test_kind.replace("_", " "), words),
+                        "Each kind of test proves one kind of thing, so the build plan's tests are generated from it (D9).", "MD35"))
 # the standard edge cases: a warning each, so the rule can be captured before every case is answered
 for case in STANDARD_CASES:
     RULES.append(policy("rule-answers-%s" % case.replace("_", "-"),
@@ -492,6 +524,35 @@ QUESTIONS.update({
               "A recovery names an existing step, so it stays true when the flow changes (D9).",
               [node("rb", "Runbook"), edge("rb", "resumes_from", "s"), node("s", "Step")], ["rb.label", "s.stepId"], "any"),
 })
+QUESTIONS.update({
+    "MD30": q("a platform lead", "Which derivation rules does no unit test exercise?",
+              "A rule's unit test runs its worked example on the built code; without it a wrong number reaches gold unnoticed (D9).",
+              [node("r", "DerivationRule"), {"not": [edge("t", "test_of", "r"), node("t", "PipelineTest", {"test_kind": "unit"})]}],
+              ["r.label"], "empty"),
+    "MD31": q("a platform lead", "Which outputs does no parity test compare with what they replace?",
+              "Before a consumer switches to an output, it is shown to give the figures it gets today, or an independent "
+              "calculation's (D9).",
+              [node("o", "Output"), {"not": [edge("t", "test_of", "o"), node("t", "PipelineTest", {"test_kind": "parity"})]}],
+              ["o.label"], "empty"),
+    "MD32": q("a platform lead", "Which medallion flows does no flow test run from start to end?",
+              "The steps are tested one by one; only a flow test shows the batch runs in order and ends validated (D9).",
+              [node("f", "Flow", {"flowKind": "medallion"}),
+               {"not": [edge("t", "test_of", "f"), node("t", "PipelineTest", {"test_kind": "flow"})]}],
+              ["f.label"], "empty"),
+    "MD33": q("a platform lead", "Which runbooks of a medallion flow does no forced-failure test exercise?",
+              "A recovery nobody tried fails the night it is needed: a failure made on purpose shows the batch stops, the right "
+              "person is told and the run resumes where the runbook says (D9).",
+              [node("rb", "Runbook"), edge("rb", "resumes_from", "s"), node("s", "Step"),
+               {"not": [edge("t", "test_of", "rb"), node("t", "PipelineTest", {"test_kind": "forced_failure"})]}],
+              ["rb.label"], "empty"),
+    "MD34": q("a platform lead", "Which tests do not say what they run on?",
+              "A test is written from its fixture and its expected result; with no fixture it cannot be written (D9).",
+              [node("t", "PipelineTest", {"fixture": {"exists": False}})], ["t.label", "t.test_kind"], "empty"),
+    "MD35": q("a platform lead", "Which tests prove the pipeline: of which kind, testing what, on what, expecting what?",
+              "The build plan's tests checkpoint (D9): what is proved before the pipeline is built and trusted.",
+              [node("t", "PipelineTest"), {"optional": [edge("t", "test_of", "x")]}],
+              ["t.label", "t.test_kind", "x.label", "x.type", "t.fixture", "t.expected_result"], "any"),
+})
 QUESTIONS["MD18"]["ask"]["when"].append({"optional": [edge("i", "runs_flow", "fl")]})
 QUESTIONS["MD18"]["ask"]["select"].append("fl.label")
 
@@ -529,6 +590,11 @@ WHY_CLASSES = {
     "Tolerance": ("MD24", "A count or a figure is never exact by accident; who set the tolerance is who answers for it.", ""),
     "FailureAction": ("MD19", "A failed gate without a named person and runbook waits until someone notices.", ""),
     "Identity": ("MD18", "Access is generated per environment; the rule that no person writes silver or gold is checked on it.", ""),
+    "PipelineTest": ("MD35", "What proves the pipeline before anyone relies on it: the implementation agent writes each test from its "
+                             "fixture and expected result, and a rule, an output, a runbook or a flow with no test shows as missing.",
+                     "The flow's TestObligation: rejected, it is derived from a step's checks for that step's code, not promised by "
+                     "the build plan for the design. The specification's name Test: rejected, it would read as any test of the "
+                     "product (DECISIONS.md)."),
 }
 #: Why each relation exists.
 WHY_PROPERTIES = {
@@ -576,6 +642,7 @@ WHY_PROPERTIES = {
     "in_environment": "Access is granted per environment, so an identity's rights in development never reach production.",
     "runs_flow": "A flow runs as a service identity, never as a person, so who changed the data is always the pipeline.",
     "resumes_from": "A recovery names the step it resumes from, so the runbook stays true when the flow changes.",
+    "test_of": "A test names what it proves, so what nothing proves shows (MD30 to MD33), and a test of the wrong kind is refused.",
 }
 
 
@@ -820,6 +887,26 @@ def design_sample(stamp):
     n("identity.analyst", "Identity", "analyst", identity_kind="human", access=["gold: read"])
     e("identity.analyst", "in_environment", "environment.prod")
     e("runbook.hard-gate-failure", "resumes_from", "step.fp-05")
+    # D9: the tests the build plan promises, drafted from D6 to D8 and confirmed by the platform lead
+    for tid, test_kind, label, exercised, fixture, expected in (
+            ("holdings-top-10-unit", "unit", "holdings top 10 on its example", ["derivationrule.holdings-top-10"],
+             "Fixture/holdings-in", "Fixture/holdings-out"),
+            ("portfolio-holdings-contract", "contract", "portfolio holdings keep contract v1", ["output.portfolio-holdings"],
+             "gold.portfolio_holdings after a month-end batch", "the fields, types and keys of portfolio holdings v1, in order"),
+            ("portfolio-holdings-parity", "parity", "portfolio holdings match the current fact sheets", ["output.portfolio-holdings"],
+             "Fixture/fact-sheet-holdings-2026-09", "the same ten holdings per fund and language, in the same order, weights within half a percent"),
+            ("portfolio-allocations-parity", "parity", "portfolio allocations match the current fact sheets", ["output.portfolio-allocations"],
+             "Fixture/fact-sheet-allocations-2026-09", "the same allocations per fund, within half a percent"),
+            ("fund-profile-flow", "flow", "a month-end batch from start to end", ["flow.fund-profile"],
+             "Fixture/month-end-sources", "every step passes in order, gold is written and the batch is marked validated"),
+            ("fund-profile-rerun", "rerun", "the same batch run twice", ["flow.fund-profile"],
+             "Fixture/month-end-sources, run twice for one period end", "the second run writes the same rows as the first"),
+            ("hard-gate-failure-forced", "forced_failure", "a duplicate holding stops the batch at gate 1",
+             ["runbook.hard-gate-failure", "qualityrule.bronze-keys-unique"], "Fixture/bronze-keys-unique-bad",
+             "gate 1 stops the batch, the platform lead is told, and once the source is fixed the run resumes from gate 1")):
+        n("pipelinetest." + tid, "PipelineTest", label, test_kind=test_kind, fixture=fixture, expected_result=expected)
+        for x in exercised:
+            e("pipelinetest." + tid, "test_of", x)
     return nodes, edges
 
 

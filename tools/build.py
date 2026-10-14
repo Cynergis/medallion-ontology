@@ -5,7 +5,7 @@
 
 Release 1 was the flow slice: the rules a declared medallion flow must satisfy. Release 2 adds the
 design slice (tools/design.py): the classes of steps D1 to D7 and D9, how the flow executes them,
-and the report-medallion bridge.
+and the report-medallion bridge. Release 3 adds the build plan's tests (D9).
 
 The flow itself is plain `flow` data (steps, waits, checks, artifacts). This ontology adds the
 medallion's own vocabulary on the flow's terms (the step kinds, a gate's number, a table's layer)
@@ -329,8 +329,9 @@ CONFIG["classes"] = design.CLASSES
 CONFIG["properties"] = design.PROPERTIES
 for _kind, _declared in design.ATTRIBUTES.items():
     CONFIG["attributes"].setdefault(_kind, {}).update(_declared)
-CONFIG["_about"] = ("The medallion pipeline: its batch flow on the flow's terms (release 1) and its design (release 2): the classes "
-                    "of the specification's steps D1 to D7 and D9, and how the flow executes them. Names follow DECISIONS.md.")
+CONFIG["_about"] = ("The medallion pipeline: its batch flow on the flow's terms (release 1), its design (release 2): the classes "
+                    "of the specification's steps D1 to D7 and D9, and how the flow executes them, and the build plan's tests "
+                    "(release 3). Names follow DECISIONS.md.")
 CONFIG["_summary"] = ("A medallion data pipeline, source systems to bronze, silver and gold: its sources, reference data, conformed "
                       "entities, gold outputs and contracts, derivation and quality rules, build plan, and the batch flow that "
                       "executes them, with the rules a design and a declared flow must satisfy.")
@@ -339,9 +340,14 @@ QUESTIONS.update(design.QUESTIONS)
 RATIONALE["classes"], RATIONALE["properties"] = design.rationale()
 RATIONALE["_about"] = ("Why each term exists: the specification's step it comes from. The rules carry their own `why`. "
                        "`validated_by` is empty until a person who knows the domain confirms the entry.")
-MANIFEST["release"] = 2
+MANIFEST["release"] = 3
 MANIFEST["summary"] = CONFIG["_summary"]
 MANIFEST["changelog"] = [
+    {"release": 3, "at": "2026-10-14",
+     "note": "The build plan's tests (D9): a PipelineTest of one of eight kinds tests a derivation rule, a quality rule, an "
+             "output, a runbook or a flow, with its fixture and expected result; a test of the wrong kind is refused; a rule with "
+             "no unit test, an output with no parity test, a flow with no flow test, a runbook with no forced-failure test and a "
+             "test that does not say what it runs on are gaps (MD30 to MD34); MD35 reads the tests back."},
     {"release": 2, "at": "2026-10-13",
      "note": "The design slice (spec 1.2.0, D1 to D7 and D9): sources, reference data, conformed entities, datasets, outputs and "
              "data contracts, derivation and quality rules, identities; a flow step executes the design; correctness as blocking "
@@ -356,7 +362,7 @@ def sample():
     graph["edges"] += edges
     graph["_about"] = ("The specification's worked instance (section 7), whole: the fund-profile data product, its two sources, the "
                        "fund and fund-holding entities, two gold outputs and a contract, the top-10 rule, a hard quality rule at "
-                       "each gate, and the flow that executes them. Neutral source names. Replace it.")
+                       "each gate, the flow that executes them and the tests that prove it. Neutral source names. Replace it.")
     return graph
 
 
@@ -375,6 +381,18 @@ capture (a field both derived and fed, a rule reading a higher layer, a step exe
 does not build, two steps executing one thing, an artifact in another layer than its dataset, a
 person writing silver or gold). What is missing is a gap, reported and not blocking: the questions
 MD3 to MD17 must come back empty before a step's checkpoint, as the specification's section 5 lists.
+
+## The build plan's tests (release 3)
+
+A `PipelineTest` is a test the build plan promises (D9): its kind, what it is a `test_of`, what it runs
+on (`fixture`) and what must come out (`expected_result`). A unit test proves a derivation rule or
+a quality rule, a contract or a parity test an output, a flow test a flow, a forced-failure test a
+quality rule or a runbook; a test of another kind than what it exercises is refused. Rerun,
+regression and integration tests may test any of them. MD30 to MD34 must come back empty to
+close the build plan: every rule has a unit test, every output a parity test, every medallion flow a
+flow test, every runbook that resumes it a forced-failure test, and every test says what it runs on.
+MD35 is the list a reviewer reads back. A step's `TestObligation` (flow) is another thing: derived
+from the step's checks, for that step's code.
 """
 
 
@@ -393,7 +411,8 @@ write("ontology.config.json", CONFIG)
 write("rules.json", {"_about": "The validations of a declared medallion flow (spec 3.8.1, 3.8.2) and of its design (D2 to D9), each naming the question it "
                                "protects.", "rules": RULES})
 write("questions.json", {"_about": "What a medallion pipeline's reviewers ask: the flow (MD1, MD2), what the design still lacks "
-                                   "(MD3 to MD17, empty when complete), and the catalogue (MD18 to MD20).", "questions": QUESTIONS})
+                                   "(MD3 to MD17 and MD30 to MD34, empty when complete), and the catalogue (MD18 to MD29, MD35).",
+                         "questions": QUESTIONS})
 write("ontology.rationale.json", RATIONALE)
 write("sample.graph.json", sample())
 write("README.md", README)

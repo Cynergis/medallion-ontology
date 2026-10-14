@@ -1,5 +1,5 @@
 {
-  "_about": "What a medallion pipeline's reviewers ask: the flow (MD1, MD2), what the design still lacks (MD3 to MD17, empty when complete), and the catalogue (MD18 to MD20).",
+  "_about": "What a medallion pipeline's reviewers ask: the flow (MD1, MD2), what the design still lacks (MD3 to MD17 and MD30 to MD34, empty when complete), and the catalogue (MD18 to MD29, MD35).",
   "questions": {
     "MD1": {
       "who": "a platform lead",
@@ -1512,6 +1512,222 @@
         "select": [
           "rb.label",
           "s.stepId"
+        ]
+      },
+      "gate": "any"
+    },
+    "MD30": {
+      "who": "a platform lead",
+      "question": "Which derivation rules does no unit test exercise?",
+      "why": "A rule's unit test runs its worked example on the built code; without it a wrong number reaches gold unnoticed (D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "r",
+            "type": "DerivationRule"
+          },
+          {
+            "not": [
+              {
+                "edge": [
+                  "t",
+                  "test_of",
+                  "r"
+                ]
+              },
+              {
+                "node": "t",
+                "type": "PipelineTest",
+                "where": {
+                  "test_kind": "unit"
+                }
+              }
+            ]
+          }
+        ],
+        "select": [
+          "r.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD31": {
+      "who": "a platform lead",
+      "question": "Which outputs does no parity test compare with what they replace?",
+      "why": "Before a consumer switches to an output, it is shown to give the figures it gets today, or an independent calculation's (D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "o",
+            "type": "Output"
+          },
+          {
+            "not": [
+              {
+                "edge": [
+                  "t",
+                  "test_of",
+                  "o"
+                ]
+              },
+              {
+                "node": "t",
+                "type": "PipelineTest",
+                "where": {
+                  "test_kind": "parity"
+                }
+              }
+            ]
+          }
+        ],
+        "select": [
+          "o.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD32": {
+      "who": "a platform lead",
+      "question": "Which medallion flows does no flow test run from start to end?",
+      "why": "The steps are tested one by one; only a flow test shows the batch runs in order and ends validated (D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "f",
+            "type": "Flow",
+            "where": {
+              "flowKind": "medallion"
+            }
+          },
+          {
+            "not": [
+              {
+                "edge": [
+                  "t",
+                  "test_of",
+                  "f"
+                ]
+              },
+              {
+                "node": "t",
+                "type": "PipelineTest",
+                "where": {
+                  "test_kind": "flow"
+                }
+              }
+            ]
+          }
+        ],
+        "select": [
+          "f.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD33": {
+      "who": "a platform lead",
+      "question": "Which runbooks of a medallion flow does no forced-failure test exercise?",
+      "why": "A recovery nobody tried fails the night it is needed: a failure made on purpose shows the batch stops, the right person is told and the run resumes where the runbook says (D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "rb",
+            "type": "Runbook"
+          },
+          {
+            "edge": [
+              "rb",
+              "resumes_from",
+              "s"
+            ]
+          },
+          {
+            "node": "s",
+            "type": "Step"
+          },
+          {
+            "not": [
+              {
+                "edge": [
+                  "t",
+                  "test_of",
+                  "rb"
+                ]
+              },
+              {
+                "node": "t",
+                "type": "PipelineTest",
+                "where": {
+                  "test_kind": "forced_failure"
+                }
+              }
+            ]
+          }
+        ],
+        "select": [
+          "rb.label"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD34": {
+      "who": "a platform lead",
+      "question": "Which tests do not say what they run on?",
+      "why": "A test is written from its fixture and its expected result; with no fixture it cannot be written (D9).",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "t",
+            "type": "PipelineTest",
+            "where": {
+              "fixture": {
+                "exists": false
+              }
+            }
+          }
+        ],
+        "select": [
+          "t.label",
+          "t.test_kind"
+        ]
+      },
+      "gate": "empty"
+    },
+    "MD35": {
+      "who": "a platform lead",
+      "question": "Which tests prove the pipeline: of which kind, testing what, on what, expecting what?",
+      "why": "The build plan's tests checkpoint (D9): what is proved before the pipeline is built and trusted.",
+      "validated_by": "",
+      "ask": {
+        "when": [
+          {
+            "node": "t",
+            "type": "PipelineTest"
+          },
+          {
+            "optional": [
+              {
+                "edge": [
+                  "t",
+                  "test_of",
+                  "x"
+                ]
+              }
+            ]
+          }
+        ],
+        "select": [
+          "t.label",
+          "t.test_kind",
+          "x.label",
+          "x.type",
+          "t.fixture",
+          "t.expected_result"
         ]
       },
       "gate": "any"
