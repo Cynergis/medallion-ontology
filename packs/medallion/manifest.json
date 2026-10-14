@@ -2,6 +2,11 @@
   "name": "medallion",
   "release": 1,
   "domain": "data",
+  "pattern": {
+    "of": "software-architecture",
+    "for": "a part of a product that is a medallion data pipeline: its sources, its bronze, silver and gold layers, its rules and the batch flow that runs them",
+    "skill": "design-pipeline"
+  },
   "summary": "Design a medallion data pipeline for a part of a product, source systems to bronze, silver and gold, checkpoint by checkpoint (D1-D9), and the batch flow that runs it, checked by the medallion rules at every capture.",
   "ontology": {
     "name": "medallion",
@@ -11,9 +16,9 @@
     "ref": null,
     "path": "ontology/medallion",
     "commit": "17382e8",
-    "embedded_at": "2026-10-13"
+    "embedded_at": "2026-10-14"
   },
-  "engine": ">=0.11.14",
+  "engine": ">=0.11.17",
   "maintainer": "Cynergis",
   "changelog": [
     {

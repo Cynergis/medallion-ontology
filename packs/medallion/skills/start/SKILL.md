@@ -10,6 +10,9 @@ Design a medallion data pipeline for a part of a product, source systems to bron
 
 This skill comes with the `medallion` pack. The ontology is inside the pack, so nothing is fetched.
 
+**A design pattern of `software-architecture`**: for a part of a product that is a medallion data pipeline: its sources, its bronze, silver and gold layers, its rules and the batch flow that runs them. In a project that composes `software-architecture`, such a part is modelled
+with this pack's **design-pipeline** skill (`/medallion:design-pipeline`); `oto status` lists the project's patterns.
+
 1. **Start a project from this pack.**
 
    ```bash
