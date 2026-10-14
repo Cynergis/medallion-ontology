@@ -3,25 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pipeline lineage</title>
+<title>Where the data comes from</title>
+<link rel="stylesheet" href="../_studio/studio.css">
+<script src="../_studio/data.js"></script>
+<script src="../_studio/studio.js"></script>
 <style>
 :root {
-  --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e2e1dc;
-  --accent: #2f5d8a; --warn: #9a5b00; --warn-bg: #fff4e0;
+  --bg: var(--st-bg); --panel: var(--st-panel); --ink: var(--st-ink); --muted: var(--st-muted); --line: var(--st-line);
+  --accent: var(--st-accent); --warn: var(--st-open); --warn-bg: var(--st-open-soft);
   --source: #6b6b66; --bronze: #9c6b30; --silver: #6f7d8c; --gold: #b08d1a;
   --hard: #a33a2b; --soft: #7a6a2b;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
-    --accent: #8db8e3; --warn: #f0b45a; --warn-bg: #3a2c14;
     --source: #a09f98; --bronze: #d29a5a; --silver: #a9b6c4; --gold: #e0c04f;
     --hard: #e07a6b; --soft: #d8c27a;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #161615; --panel: #1f1f1d; --ink: #ecebe6; --muted: #a09f98; --line: #34332f;
-  --accent: #8db8e3; --warn: #f0b45a; --warn-bg: #3a2c14;
   --source: #a09f98; --bronze: #d29a5a; --silver: #a9b6c4; --gold: #e0c04f;
   --hard: #e07a6b; --soft: #d8c27a;
 }
@@ -68,7 +67,7 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
 </head>
 <body>
 <header>
-  <h1>Pipeline lineage</h1>
+  <h1>Where the data comes from</h1>
   <p id="sub"></p>
   <div class="strip" id="strip"></div>
 </header>
@@ -79,6 +78,7 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
   </nav>
   <section id="view"></section>
 </main>
+<div class="studio-page" style="max-width: none; padding-top: 8px;"><div id="studio-open"></div></div>
 <script src="data.js"></script>
 <script>
 (function () {
@@ -101,9 +101,9 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
   const byLayer = (l) => (D.datasets || []).filter((d) => d.layer === l).length;
   const gates = [1, 2, 3].map((g) => (D.quality || []).filter((q) => q.gate === g).length);
   document.getElementById('strip').innerHTML = [
-    ['source tables', (D.tables || []).length], ['silver datasets', byLayer('silver')], ['gold datasets', byLayer('gold')],
-    ['outputs', (D.outputs || []).length], ['derivation rules', (D.rules || []).length],
-    ['quality rules at gates 1·2·3', gates.join('·')],
+    ['source tables', (D.tables || []).length], ['conformed datasets (silver)', byLayer('silver')], ['output datasets (gold)', byLayer('gold')],
+    ['outputs', (D.outputs || []).length], ['calculation rules', (D.rules || []).length],
+    ['quality checks', gates.reduce((a, b) => a + b, 0)],
   ].map(([k, v]) => '<span class="chip"><b>' + esc(v) + '</b> ' + esc(k) + '</span>').join('');
 
   // navigation: outputs (gold), then entities (silver), each with its dataset's fields
@@ -118,8 +118,8 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
   }
   const short = (label) => String(label).split('.').pop();
   const tree = document.getElementById('tree');
-  tree.innerHTML = group('Gold outputs', D.outputs || []) + group('Silver entities', D.entities || []) ||
-    '<p class="empty">No outputs or entities yet. The design-pipeline skill captures them (D4, D5).</p>';
+  tree.innerHTML = group('Outputs (gold)', D.outputs || []) + group('Conformed entities (silver)', D.entities || []) ||
+    '<p class="empty">Nothing recorded yet: the outputs and entities appear here once the pipeline is designed.</p>';
   document.getElementById('filter').addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
     tree.querySelectorAll('li').forEach((li) => { li.hidden = term && !li.textContent.toLowerCase().includes(term); });
@@ -127,50 +127,55 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
 
   // one value's lineage, upstream
   function layerOf(fieldId) { const d = datasets[(fields[fieldId] || {}).dataset]; return d ? d.layer : ''; }
+  // in words: where a check runs, and what happens when it fails; the rule's id and assertion stay in the explorer
+  const ARRIVES = {1: 'on arrival in bronze', 2: 'on arrival in silver', 3: 'on arrival in gold'};
+  const words = (t) => String(t || '').replace(/_/g, ' ');
   function guarded(...ids) {
-    const qs = ids.flatMap((id) => guards[id] || []);
-    return qs.length ? '<div class="q">' + qs.map((q) => '<span class="' + esc(q.severity) + '">gate ' + esc(q.gate) + ' ' +
-      esc(q.severity || '') + '</span> ' + esc(q.rule_id || q.label) + (q.assertion ? ': <code>' + esc(q.assertion) + '</code>' : '') +
-      ((q.report_checks || []).length ? ' · relied on by ' + esc(q.report_checks.join(', ')) : '')).join('<br>') + '</div>' : '';
+    const seenQ = new Set();
+    const qs = ids.flatMap((id) => guards[id] || []).filter((q) => !seenQ.has(q.id || q.label) && seenQ.add(q.id || q.label));
+    return qs.length ? '<div class="q">' + qs.map((q) => '<span class="' + esc(q.severity) + '">' +
+      (q.severity === 'hard' ? 'Stops the run' : 'Warns') + '</span> ' + esc(ARRIVES[q.gate] || 'when checked') + ': ' + esc(q.label) +
+      ((q.report_checks || []).length ? ' · the report relies on it' : '')).join('<br>') + '</div>' : '';
   }
-  function step(s) { return s ? ' · built by <b>' + esc(s.label) + '</b>' + (s.kind ? ' (' + esc(s.kind) + ')' : '') : ''; }
+  function step(s) { return s ? ' · built by <b>' + esc(s.label) + '</b>' : ''; }
+  const LAYER = {gold: 'Output field (gold)', silver: 'Conformed field (silver)', bronze: 'Raw copy (bronze)'};
   function render(id, seen) {
     if (seen.has(id)) return '<div class="rel">(already shown above)</div>';
     seen = new Set(seen).add(id);
     if (fields[id]) {
       const f = fields[id], d = datasets[f.dataset] || {}, layer = d.layer || '';
-      let html = '<div class="card ' + esc(layer) + '"><div class="kind">' + esc(layer || 'field') + ' field</div><h3>' + esc(f.label) + '</h3>' +
-        '<div class="meta">' + [f.type, f.term && 'term ' + f.term, f.required ? 'required' : null, d.label && 'in ' + d.label]
+      let html = '<div class="card ' + esc(layer) + '"><div class="kind">' + esc(LAYER[layer] || 'Field') + '</div><h3>' + esc(f.label) + '</h3>' +
+        '<div class="meta">' + [f.term && 'means ' + f.term, f.required ? 'always filled' : null, d.label && 'in ' + d.label]
           .filter(Boolean).map(esc).join(' · ') + step(builders[f.dataset]) + '</div>' +
-        (d.contract ? '<div class="meta">contract ' + esc(d.contract.label) + (d.contract.version && !String(d.contract.label).includes(d.contract.version) ? ' v' + esc(d.contract.version) : '') + '</div>' : '') +
+        (d.contract ? '<div class="meta">promised by ' + esc(d.contract.label) + (d.contract.version && !String(d.contract.label).includes(d.contract.version) ? ' v' + esc(d.contract.version) : '') + '</div>' : '') +
         guarded(id, f.dataset) + '</div>';
       let up = '';
-      if (f.derived_by) up += '<div class="rel">derived by</div>' + render(f.derived_by, seen);
-      for (const s of f.fed_by || []) up += '<div class="rel">fed by</div>' + render(s, seen);
-      if (!up && layer !== 'bronze') up = '<div class="gap">No lineage yet: neither derived by a rule nor fed by a column or a field (MD9).</div>';
+      if (f.derived_by) up += '<div class="rel">calculated by</div>' + render(f.derived_by, seen);
+      for (const s of f.fed_by || []) up += '<div class="rel">copied from</div>' + render(s, seen);
+      if (!up && layer !== 'bronze') up = '<div class="gap">Nobody has said where it comes from yet: neither calculated by a rule nor copied from a column or another field.</div>';
       return html + (up ? '<div class="up">' + up + '</div>' : '');
     }
     if (rules[id]) {
       const r = rules[id];
       const cases = (r.edge_cases || []).map((c) => '<li>' + esc(c.case) + ': ' + esc(c.behaviour) + '</li>').join('');
-      let html = '<div class="card rule"><div class="kind">' + esc(r.kind || 'rule') + ' rule</div><h3>' + esc(r.label) + '</h3>' +
-        (r.logic ? '<div class="meta"><code>' + esc(r.logic) + '</code></div>' : '') +
-        '<div class="meta">' + [r.period_dependency, r.examples + ' example' + (r.examples === 1 ? '' : 's')].filter(Boolean).map(esc).join(' · ') + step(r.built_by) + '</div>' +
+      let html = '<div class="card rule"><div class="kind">Calculation rule' + (r.kind ? ': ' + esc(words(r.kind)) : '') + '</div><h3>' + esc(r.label) + '</h3>' +
+        (r.logic ? '<div class="meta">' + esc(r.logic) + '</div>' : '') +
+        '<div class="meta">' + [words(r.period_dependency), r.examples ? (r.examples === 1 ? 'one worked example' : r.examples + ' worked examples') : null].filter(Boolean).map(esc).join(' · ') + step(r.built_by) + '</div>' +
         (cases ? '<ul class="edge">' + cases + '</ul>' : '') + '</div>';
-      if (!r.examples) html += '<div class="gap">No worked example yet (MD11).</div>';
-      const up = (r.inputs || []).map((i) => '<div class="rel">reads</div>' + render(i, seen)).join('');
+      if (!r.examples) html += '<div class="gap">No worked example yet: a person works one out to check the rule.</div>';
+      const up = (r.inputs || []).map((i) => '<div class="rel">from</div>' + render(i, seen)).join('');
       return html + (up ? '<div class="up">' + up + '</div>' : '');
     }
     if (columns[id]) {
       const c = columns[id], t = tables[c.table] || {};
       const copy = t.copy || {};
-      return '<div class="card source"><div class="kind">source column</div><h3>' + esc(c.label) + '</h3>' +
-        '<div class="meta">' + [c.type, c.term ? 'term ' + c.term : null].filter(Boolean).map(esc).join(' · ') + '</div>' +
-        (t.label ? '<div class="meta">' + esc(t.label) + (t.system ? ' from ' + esc(t.system) : '') +
-          (t.change_behaviour ? ' · ' + esc(t.change_behaviour) : '') + (copy.method ? ' · copied by ' + esc(copy.method) : '') + step(copy.built_by) + '</div>' : '') +
-        (c.term ? '' : '<div class="gap">No business term on this column (MD5).</div>') + '</div>';
+      return '<div class="card source"><div class="kind">Source column</div><h3>' + esc(c.label) + '</h3>' +
+        (c.term ? '<div class="meta">means ' + esc(c.term) + '</div>' : '') +
+        (t.label ? '<div class="meta">in ' + esc(t.label) + (t.system ? ', from ' + esc(t.system) : '') +
+          (t.change_behaviour ? ' · ' + esc(words(t.change_behaviour)) : '') + (copy.method ? ' · copied by ' + esc(words(copy.method)) : '') + step(copy.built_by) + '</div>' : '') +
+        (c.term ? '' : '<div class="gap">Nobody has said what this column means in the business\'s words yet.</div>') + '</div>';
     }
-    return '<div class="card"><h3>' + esc(id) + '</h3><div class="meta">not in this graph</div></div>';
+    return '<div class="card"><div class="meta">Not recorded.</div></div>';
   }
   function show(id) {
     const view = document.getElementById('view');
@@ -178,10 +183,11 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
     const link = tree.querySelector('a[data-id="' + CSS.escape(id) + '"]');
     if (link) link.classList.add('on');
     if (!fields[id]) { view.innerHTML = '<p class="empty">Pick a field to see where its value comes from.</p>'; return; }
+    const linked = (sid, text) => (window.Studio ? Studio.link(sid, text) : esc(text));
     const shown = (fields[id].report || []).flatMap((r) => (r.shown_as || []).map((s) =>
-      '<div class="card report"><div class="kind">report field</div><h3>' + esc(s.label) + '</h3><div class="meta">' +
-      (s.report ? 'in ' + esc(s.report) + ' · ' : '') + 'column ' + esc(r.column) + '</div></div>'));
-    view.innerHTML = (shown.length ? shown.join('') + '<div class="rel">reads</div>' : '') + render(id, new Set());
+      '<div class="card report"><div class="kind">Shown in a report</div><h3>' + linked(s.id, s.label) + '</h3><div class="meta">' +
+      (s.report ? 'in ' + esc(s.report) + ' · ' : '') + 'from the column ' + esc(r.column) + '</div></div>'));
+    view.innerHTML = (shown.length ? shown.join('') + '<div class="rel">which reads</div>' : '') + render(id, new Set());
   }
   const first = tree.querySelector('a[data-id]');
   const pick = () => show(decodeURIComponent(location.hash.slice(1)) || (first && first.dataset.id) || '');

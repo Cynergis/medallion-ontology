@@ -171,7 +171,8 @@
           "$out": "inReport",
           "$select": "$label"
          }
-        }
+        },
+        "id": "$id"
        }
       }
      }

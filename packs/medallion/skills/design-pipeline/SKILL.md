@@ -121,10 +121,11 @@ platform binding says how each step kind is realised. For a report fed by this p
 `report-medallion` bridge links a report's table to the gold dataset it reads (RM1 traces a
 report's value back to its source column).
 
-Show the pipeline with this pack's **lineage** view: pick a gold or silver field and it walks up to
-the source column, with the step that builds each part and the quality rules that guard it, and the
-gaps on the way. Every project that declares this pack has it: `oto serve --project <root> --http
-<port>` lists it on the project's home page beside the other packs' views, `oto build --project
-<root> --target site` writes it into the site, and `--view lineage` shows it alone.
+The pipeline shows on the product's studio page **Where the data comes from** (this pack's
+`lineage` view): pick a gold or silver field and it walks up to the source column, with the step that
+builds each part and the checks that guard it, and what is still missing on the way; a report field
+fed by it links to the report's page. Every project that declares this pack has it: `oto serve
+--project <root> --http <port>` serves the studio, and `oto build --project <root> --target site`
+writes it. Say so when a checkpoint closes, in plain words.
 
 Do not edit the vocabulary, another data product's items, or anything outside this pipeline.
