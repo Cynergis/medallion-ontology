@@ -95,3 +95,13 @@ def test_with_the_bridge_the_lineage_view_shows_the_report_field_on_top(tmp_path
     pct = data["fields"]["field.gold.portfolio_holdings.holding_pct"]
     shown = [s for r in pct["report"] for s in r["shown_as"]]
     assert shown and all(s["report"] for s in shown)
+
+
+@pytest.mark.parametrize("pack", ["medallion", "report-medallion"])
+def test_every_pack_skill_talks_in_plain_language(pack):
+    """Technical details are the record's: no skill talks in codes, ids or engine output, none offers them."""
+    import glob
+    for skill in sorted(glob.glob(os.path.join(PACKS, pack, "skills", "*", "SKILL.md"))):
+        text = open(skill, encoding="utf-8").read()
+        assert text.count("## Talking with the person") == 1 and "Never offer them" in text, skill
+        assert "engine's words" not in text and "N of M" not in text, skill

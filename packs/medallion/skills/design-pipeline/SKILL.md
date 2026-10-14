@@ -24,6 +24,14 @@ The design says **what** the pipeline does, never **how** on a given platform: n
 orchestrator, framework or language is captured here. That is the platform binding, a separate
 document; if someone names a tool, record it as a decision of the architecture, not on these items.
 
+## Talking with the person
+
+- **Plain, natural language, in the person's words.** Never say question numbers, ids, class or
+  field names, file names or commands, and never paste what a command printed.
+- **Technical details only when the person asks for them.** Never offer them, not even as a choice.
+- **The same clear shape every time:** say what we are about to do, ask a few questions at a time,
+  read back what you understood in plain sentences, confirm, then say what is next.
+
 ## Before the first question
 
 1. The project composes `medallion`: `oto status --project <root>` names it, and the vocabulary
@@ -53,10 +61,11 @@ oto curate check --project <root>
 oto curate apply --project <root> --by "<who gave it>" --note "<step>: <what it made answerable>"
 ```
 
-Read the check in the engine's words. **Blocking** is a contradiction: a field both derived and
+Read the check (for you) and tell the person in plain words. **Blocking** is a contradiction: a field both derived and
 fed, a rule reading a higher layer than it writes, a step building in the wrong layer, two steps
 executing one thing, a person writing silver or gold. Fix the capture and propose it again; never
-force. **A gap** is something missing: report it with who can answer it and go on. A person who does
+force; say what does not hold together and how to settle it. **A gap** is something missing:
+say what is still open, with who can answer it, and go on. A person who does
 not know an answer leaves the item out; do not guess, and never invent a count, a tolerance or an
 example.
 
@@ -66,7 +75,9 @@ Each step ends at a checkpoint its approver closes. A checkpoint is closed when 
 come back **empty** (`oto query --project <root> questions`, or `kg_ask MD<n>`) and its approver
 confirms the catalogue question read back to them: then apply the last group with
 `--by "<approver>" --note "checkpoint D<n>: <name>"`. Until then, say what is owed and by whom.
-D4 to D7 repeat per entity or output; say which are closed.
+D4 to D7 repeat per entity or output; say which are closed. The step codes, the gap and catalogue
+questions in the table are for you: to the person, a checkpoint is what it settles ("the sources and
+how each is copied"), and what is open is what the question asks, never its number.
 
 | Step | Captures | Gaps, empty to close | Read back | Approver |
 |---|---|---|---|---|
