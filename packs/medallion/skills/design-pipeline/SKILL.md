@@ -112,8 +112,8 @@ report's value back to its source column).
 
 Show the pipeline with this pack's **lineage** view: pick a gold or silver field and it walks up to
 the source column, with the step that builds each part and the quality rules that guard it, and the
-gaps on the way. A project started from this pack has it (`oto serve --project <root> --view
-lineage`); any other project names it by path:
-`oto build --project <root> --target site --view "${CLAUDE_PLUGIN_ROOT}/views/lineage"`.
+gaps on the way. Every project that declares this pack has it: `oto serve --project <root> --http
+<port>` lists it on the project's home page beside the other packs' views, `oto build --project
+<root> --target site` writes it into the site, and `--view lineage` shows it alone.
 
 Do not edit the vocabulary, another data product's items, or anything outside this pipeline.
