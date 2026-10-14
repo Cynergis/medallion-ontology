@@ -53,6 +53,15 @@
       "kind": "$attr.stepKind"
      }
     }
+   },
+   "tests": {
+    "$optional": {
+     "$in": "test_of",
+     "$select": {
+      "label": "$label",
+      "kind": "$attr.test_kind"
+     }
+    }
    }
   }
  },
@@ -212,6 +221,15 @@
      "$select": {
       "label": "$label",
       "kind": "$attr.stepKind"
+     }
+    }
+   },
+   "tests": {
+    "$optional": {
+     "$in": "test_of",
+     "$select": {
+      "label": "$label",
+      "kind": "$attr.test_kind"
      }
     }
    }

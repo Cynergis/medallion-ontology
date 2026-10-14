@@ -1,5 +1,5 @@
 {
-  "_about": "The specification's worked instance (section 7), whole: the fund-profile data product, its two sources, the fund and fund-holding entities, two gold outputs and a contract, the top-10 rule, a hard quality rule at each gate, and the flow that executes them. Neutral source names. Replace it.",
+  "_about": "The specification's worked instance (section 7), whole: the fund-profile data product, its two sources, the fund and fund-holding entities, two gold outputs and a contract, the top-10 rule, a hard quality rule at each gate, the flow that executes them and the tests that prove it. Neutral source names. Replace it.",
   "nodes": [
     {
       "id": "flow.fund-profile",
@@ -3515,6 +3515,195 @@
           "quote": "analyst"
         }
       ]
+    },
+    {
+      "id": "pipelinetest.holdings-top-10-unit",
+      "type": "PipelineTest",
+      "label": "holdings top 10 on its example",
+      "summary": "holdings top 10 on its example",
+      "attributes": {
+        "test_kind": "unit",
+        "fixture": "Fixture/holdings-in",
+        "expected_result": "Fixture/holdings-out"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "holdings top 10 on its example"
+        }
+      ]
+    },
+    {
+      "id": "pipelinetest.portfolio-holdings-contract",
+      "type": "PipelineTest",
+      "label": "portfolio holdings keep contract v1",
+      "summary": "portfolio holdings keep contract v1",
+      "attributes": {
+        "test_kind": "contract",
+        "fixture": "gold.portfolio_holdings after a month-end batch",
+        "expected_result": "the fields, types and keys of portfolio holdings v1, in order"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "portfolio holdings keep contract v1"
+        }
+      ]
+    },
+    {
+      "id": "pipelinetest.portfolio-holdings-parity",
+      "type": "PipelineTest",
+      "label": "portfolio holdings match the current fact sheets",
+      "summary": "portfolio holdings match the current fact sheets",
+      "attributes": {
+        "test_kind": "parity",
+        "fixture": "Fixture/fact-sheet-holdings-2026-09",
+        "expected_result": "the same ten holdings per fund and language, in the same order, weights within half a percent"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "portfolio holdings match the current fact sheets"
+        }
+      ]
+    },
+    {
+      "id": "pipelinetest.portfolio-allocations-parity",
+      "type": "PipelineTest",
+      "label": "portfolio allocations match the current fact sheets",
+      "summary": "portfolio allocations match the current fact sheets",
+      "attributes": {
+        "test_kind": "parity",
+        "fixture": "Fixture/fact-sheet-allocations-2026-09",
+        "expected_result": "the same allocations per fund, within half a percent"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "portfolio allocations match the current fact sheets"
+        }
+      ]
+    },
+    {
+      "id": "pipelinetest.fund-profile-flow",
+      "type": "PipelineTest",
+      "label": "a month-end batch from start to end",
+      "summary": "a month-end batch from start to end",
+      "attributes": {
+        "test_kind": "flow",
+        "fixture": "Fixture/month-end-sources",
+        "expected_result": "every step passes in order, gold is written and the batch is marked validated"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "a month-end batch from start to end"
+        }
+      ]
+    },
+    {
+      "id": "pipelinetest.fund-profile-rerun",
+      "type": "PipelineTest",
+      "label": "the same batch run twice",
+      "summary": "the same batch run twice",
+      "attributes": {
+        "test_kind": "rerun",
+        "fixture": "Fixture/month-end-sources, run twice for one period end",
+        "expected_result": "the second run writes the same rows as the first"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "the same batch run twice"
+        }
+      ]
+    },
+    {
+      "id": "pipelinetest.hard-gate-failure-forced",
+      "type": "PipelineTest",
+      "label": "a duplicate holding stops the batch at gate 1",
+      "summary": "a duplicate holding stops the batch at gate 1",
+      "attributes": {
+        "test_kind": "forced_failure",
+        "fixture": "Fixture/bronze-keys-unique-bad",
+        "expected_result": "gate 1 stops the batch, the platform lead is told, and once the source is fixed the run resumes from gate 1"
+      },
+      "status": "current",
+      "as_of": "2026-10-13",
+      "valid_from": "2026-10-13",
+      "source_doc": "medallion-pipeline-ontology",
+      "sources": [
+        "medallion-pipeline-ontology"
+      ],
+      "aliases": [],
+      "tags": [],
+      "evidence": [
+        {
+          "doc": "medallion-pipeline-ontology",
+          "where": "7",
+          "quote": "a duplicate holding stops the batch at gate 1"
+        }
+      ]
     }
   ],
   "edges": [
@@ -4992,6 +5181,46 @@
       "from": "runbook.hard-gate-failure",
       "rel": "resumes_from",
       "to": "step.fp-05"
+    },
+    {
+      "from": "pipelinetest.holdings-top-10-unit",
+      "rel": "test_of",
+      "to": "derivationrule.holdings-top-10"
+    },
+    {
+      "from": "pipelinetest.portfolio-holdings-contract",
+      "rel": "test_of",
+      "to": "output.portfolio-holdings"
+    },
+    {
+      "from": "pipelinetest.portfolio-holdings-parity",
+      "rel": "test_of",
+      "to": "output.portfolio-holdings"
+    },
+    {
+      "from": "pipelinetest.portfolio-allocations-parity",
+      "rel": "test_of",
+      "to": "output.portfolio-allocations"
+    },
+    {
+      "from": "pipelinetest.fund-profile-flow",
+      "rel": "test_of",
+      "to": "flow.fund-profile"
+    },
+    {
+      "from": "pipelinetest.fund-profile-rerun",
+      "rel": "test_of",
+      "to": "flow.fund-profile"
+    },
+    {
+      "from": "pipelinetest.hard-gate-failure-forced",
+      "rel": "test_of",
+      "to": "runbook.hard-gate-failure"
+    },
+    {
+      "from": "pipelinetest.hard-gate-failure-forced",
+      "rel": "test_of",
+      "to": "qualityrule.bronze-keys-unique"
     }
   ]
 }

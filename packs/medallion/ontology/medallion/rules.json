@@ -2144,6 +2144,161 @@
       "answers": "MD16"
     },
     {
+      "id": "a-unit-test-tests-a-derivation-rule-or-a-quality-rule",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "t",
+          "type": "PipelineTest",
+          "where": {
+            "test_kind": "unit"
+          }
+        },
+        {
+          "edge": [
+            "t",
+            "test_of",
+            "x"
+          ]
+        },
+        {
+          "node": "x",
+          "type": "Output|Runbook|Flow"
+        }
+      ],
+      "then": {
+        "flag": "a unit test is a test of something it cannot prove: it tests a derivation rule or a quality rule"
+      },
+      "why": "Each kind of test proves one kind of thing, so the build plan's tests are generated from it (D9).",
+      "validated_by": "",
+      "answers": "MD35"
+    },
+    {
+      "id": "a-contract-test-tests-an-output",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "t",
+          "type": "PipelineTest",
+          "where": {
+            "test_kind": "contract"
+          }
+        },
+        {
+          "edge": [
+            "t",
+            "test_of",
+            "x"
+          ]
+        },
+        {
+          "node": "x",
+          "type": "DerivationRule|QualityRule|Runbook|Flow"
+        }
+      ],
+      "then": {
+        "flag": "a contract test is a test of something it cannot prove: it tests an output"
+      },
+      "why": "Each kind of test proves one kind of thing, so the build plan's tests are generated from it (D9).",
+      "validated_by": "",
+      "answers": "MD35"
+    },
+    {
+      "id": "a-parity-test-tests-an-output",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "t",
+          "type": "PipelineTest",
+          "where": {
+            "test_kind": "parity"
+          }
+        },
+        {
+          "edge": [
+            "t",
+            "test_of",
+            "x"
+          ]
+        },
+        {
+          "node": "x",
+          "type": "DerivationRule|QualityRule|Runbook|Flow"
+        }
+      ],
+      "then": {
+        "flag": "a parity test is a test of something it cannot prove: it tests an output"
+      },
+      "why": "Each kind of test proves one kind of thing, so the build plan's tests are generated from it (D9).",
+      "validated_by": "",
+      "answers": "MD35"
+    },
+    {
+      "id": "a-flow-test-tests-a-flow",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "t",
+          "type": "PipelineTest",
+          "where": {
+            "test_kind": "flow"
+          }
+        },
+        {
+          "edge": [
+            "t",
+            "test_of",
+            "x"
+          ]
+        },
+        {
+          "node": "x",
+          "type": "DerivationRule|QualityRule|Output|Runbook"
+        }
+      ],
+      "then": {
+        "flag": "a flow test is a test of something it cannot prove: it tests a flow"
+      },
+      "why": "Each kind of test proves one kind of thing, so the build plan's tests are generated from it (D9).",
+      "validated_by": "",
+      "answers": "MD35"
+    },
+    {
+      "id": "a-forced-failure-test-tests-a-quality-rule-or-a-runbook",
+      "kind": "policy",
+      "severity": "blocking",
+      "when": [
+        {
+          "node": "t",
+          "type": "PipelineTest",
+          "where": {
+            "test_kind": "forced_failure"
+          }
+        },
+        {
+          "edge": [
+            "t",
+            "test_of",
+            "x"
+          ]
+        },
+        {
+          "node": "x",
+          "type": "DerivationRule|Output|Flow"
+        }
+      ],
+      "then": {
+        "flag": "a forced failure test is a test of something it cannot prove: it tests a quality rule or a runbook"
+      },
+      "why": "Each kind of test proves one kind of thing, so the build plan's tests are generated from it (D9).",
+      "validated_by": "",
+      "answers": "MD35"
+    },
+    {
       "id": "rule-answers-tie",
       "kind": "policy",
       "severity": "warn",

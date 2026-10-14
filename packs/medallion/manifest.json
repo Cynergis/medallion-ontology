@@ -10,12 +10,12 @@
   "summary": "Design a medallion data pipeline for a part of a product, source systems to bronze, silver and gold, checkpoint by checkpoint (D1-D9), and the batch flow that runs it, checked by the medallion rules at every capture.",
   "ontology": {
     "name": "medallion",
-    "release": 2,
+    "release": 3,
     "registry": null,
     "source": "https://github.com/Cynergis/medallion-ontology",
     "ref": null,
     "path": "ontology/medallion",
-    "commit": "17382e8",
+    "commit": "867e84b",
     "embedded_at": "2026-10-14"
   },
   "engine": ">=0.11.17",

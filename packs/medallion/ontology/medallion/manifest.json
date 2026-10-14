@@ -1,6 +1,6 @@
 {
   "name": "medallion",
-  "release": 2,
+  "release": 3,
   "domain": "data",
   "summary": "A medallion data pipeline, source systems to bronze, silver and gold: its sources, reference data, conformed entities, gold outputs and contracts, derivation and quality rules, build plan, and the batch flow that executes them, with the rules a design and a declared flow must satisfy.",
   "extends": [
@@ -20,6 +20,11 @@
   "maintainer": "Cynergis",
   "changelog": [
     {
+      "release": 3,
+      "at": "2026-10-14",
+      "note": "The build plan's tests (D9): a PipelineTest of one of eight kinds tests a derivation rule, a quality rule, an output, a runbook or a flow, with its fixture and expected result; a test of the wrong kind is refused; a rule with no unit test, an output with no parity test, a flow with no flow test, a runbook with no forced-failure test and a test that does not say what it runs on are gaps (MD30 to MD34); MD35 reads the tests back."
+    },
+    {
       "release": 2,
       "at": "2026-10-13",
       "note": "The design slice (spec 1.2.0, D1 to D7 and D9): sources, reference data, conformed entities, datasets, outputs and data contracts, derivation and quality rules, identities; a flow step executes the design; correctness as blocking rules, completeness as questions that must come back empty. Names per DECISIONS.md."
@@ -32,7 +37,7 @@
   ],
   "source": "https://github.com/Cynergis/medallion-ontology",
   "path": "ontology/medallion",
-  "commit": "17382e8",
-  "fetched_at": "2026-10-13T15:28:09+00:00",
+  "commit": "867e84b",
+  "fetched_at": "2026-10-14T23:30:00+00:00",
   "_about": "The ontology's identity: its release rises on every published change, `extends` names what it composes on top of, `carries` what the directory holds."
 }

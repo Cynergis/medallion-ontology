@@ -38,3 +38,15 @@ capture (a field both derived and fed, a rule reading a higher layer, a step exe
 does not build, two steps executing one thing, an artifact in another layer than its dataset, a
 person writing silver or gold). What is missing is a gap, reported and not blocking: the questions
 MD3 to MD17 must come back empty before a step's checkpoint, as the specification's section 5 lists.
+
+## The build plan's tests (release 3)
+
+A `PipelineTest` is a test the build plan promises (D9): its kind, what it is a `test_of`, what it runs
+on (`fixture`) and what must come out (`expected_result`). A unit test proves a derivation rule or
+a quality rule, a contract or a parity test an output, a flow test a flow, a forced-failure test a
+quality rule or a runbook; a test of another kind than what it exercises is refused. Rerun,
+regression and integration tests may test any of them. MD30 to MD34 must come back empty to
+close the build plan: every rule has a unit test, every output a parity test, every medallion flow a
+flow test, every runbook that resumes it a forced-failure test, and every test says what it runs on.
+MD35 is the list a reviewer reads back. A step's `TestObligation` (flow) is another thing: derived
+from the step's checks, for that step's code.

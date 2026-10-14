@@ -1,7 +1,7 @@
 ---
 name: start
 description: >-
-  Start or extend an OTO knowledge project in this domain: Design a medallion data pipeline for a part of a product, source systems to bronze, silver and gold, checkpoint by checkpoint (D1-D9), and the batch flow that runs it, checked by the medallion rules at every capture. The pack 'medallion' (release 1) embeds the ontology 'medallion' (release 2), which declares SourceSystem, SourceTable, SourceColumn, CopyPolicy, TermMapping, CodeSet, CodeMapping, ConformedEntity and more. Use when someone wants a knowledge graph, a vocabulary or an interview for this domain.
+  Start or extend an OTO knowledge project in this domain: Design a medallion data pipeline for a part of a product, source systems to bronze, silver and gold, checkpoint by checkpoint (D1-D9), and the batch flow that runs it, checked by the medallion rules at every capture. The pack 'medallion' (release 1) embeds the ontology 'medallion' (release 3), which declares SourceSystem, SourceTable, SourceColumn, CopyPolicy, TermMapping, CodeSet, CodeMapping, ConformedEntity and more. Use when someone wants a knowledge graph, a vocabulary or an interview for this domain.
 ---
 
 # Medallion pipeline
@@ -67,6 +67,7 @@ with this pack's **design-pipeline** skill (`/medallion:design-pipeline`); `oto 
 - **Tolerance**: How far off a count or a figure may be, in which unit, set by whom (D4, D7).
 - **FailureAction**: What happens when a quality rule fails: who is told, which runbook they follow, whether the step retries (D7).
 - **Identity**: A principal the pipeline runs as or a person who reads it: its kind, the environment, its access to datasets (D9).
+- **PipelineTest**: A test the build plan promises, and what it proves: its kind (unit, contract, parity, rerun, regression, integration, forced failure, flow), the rule, output, runbook or flow it tests, what it runs on and what must come out (D9). Not a flow TestObligation, which a step's checks derive for its code (DECISIONS.md).
 
 ## The views it ships
 
