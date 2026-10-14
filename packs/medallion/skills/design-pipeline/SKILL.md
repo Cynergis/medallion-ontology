@@ -8,8 +8,8 @@ description: >-
   checkpoint (D1 to D9), each refused by the medallion rules when it contradicts itself and
   reported when it is incomplete. Use when a part of the product is a data pipeline: "design the
   pipeline", "onboard a source", "define the gold output", "the quality rules at gate 2", "declare
-  the batch flow", or when a studio's architecture-build reaches a part that follows the medallion
-  pattern.
+  the batch flow", or when the software-architecture pack's architecture-build hands it a part that
+  follows the medallion pattern.
 ---
 
 # Design a medallion pipeline
@@ -28,7 +28,7 @@ document; if someone names a tool, record it as a decision of the architecture, 
 
 1. The project composes `medallion`: `oto status --project <root>` names it, and the vocabulary
    holds `ConformedEntity`. The pattern is chosen when the project starts:
-   `oto init --pack <studio> --ontology product-<type>,medallion,flow` beside the others, or
+   `oto init --pack product --ontology product-<type>,software-architecture,medallion,flow`, or
    `oto init --pack "${CLAUDE_PLUGIN_ROOT}"` for a pipeline alone. A report product with a pipeline
    adds the `report-medallion` bridge (its own pack). A project started without `medallion` cannot
    add it afterwards.
@@ -40,8 +40,8 @@ document; if someone names a tool, record it as a decision of the architecture, 
 
 ## How each group is captured
 
-Run OTO's **capture-form** skill on the project's `capture.json` (inside the PRD & Architecture
-Studio, its **elicit** skill, which adds the studio's menu). A few related items at a time, in the
+Run OTO's **capture-form** skill on the project's `capture.json`, with its menu at every
+confirmation ([A] elicit, [P] perspectives, [C] continue). A few related items at a time, in the
 words of the person answering, never the ontology's; `kg_define <term>` when a term is unclear.
 Every confirmed group goes through the gates as a capture with `scope` the data product:
 
