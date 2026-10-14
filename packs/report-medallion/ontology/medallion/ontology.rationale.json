@@ -132,6 +132,12 @@
       "why": "Access is generated per environment; the rule that no person writes silver or gold is checked on it.",
       "alternatives": "",
       "validated_by": ""
+    },
+    "PipelineTest": {
+      "question": "Which tests prove the pipeline: of which kind, testing what, on what, expecting what?",
+      "why": "What proves the pipeline before anyone relies on it: the implementation agent writes each test from its fixture and expected result, and a rule, an output, a runbook or a flow with no test shows as missing.",
+      "alternatives": "The flow's TestObligation: rejected, it is derived from a step's checks for that step's code, not promised by the build plan for the design. The specification's name Test: rejected, it would read as any test of the product (DECISIONS.md).",
+      "validated_by": ""
     }
   },
   "properties": {
@@ -396,6 +402,12 @@
     "resumes_from": {
       "question": "resumes from",
       "why": "A recovery names the step it resumes from, so the runbook stays true when the flow changes.",
+      "alternatives": "",
+      "validated_by": ""
+    },
+    "test_of": {
+      "question": "test of",
+      "why": "A test names what it proves, so what nothing proves shows (MD30 to MD33), and a test of the wrong kind is refused.",
       "alternatives": "",
       "validated_by": ""
     }

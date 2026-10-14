@@ -54,6 +54,9 @@ section#view { padding: 16px; min-width: 0; }
 .up { margin-left: 18px; padding-left: 12px; border-left: 1px dashed var(--line); }
 .rel { font-size: 12px; color: var(--muted); margin: 2px 0 4px; }
 .q { font-size: 12px; margin-top: 4px; }
+.t { font-size: 12px; margin-top: 4px; }
+.t span { font-weight: 600; }
+.card .gap { margin: 6px 0 0; }
 .q .hard { color: var(--hard); font-weight: 600; } .q .soft { color: var(--soft); font-weight: 600; }
 .gap { background: var(--warn-bg); color: var(--warn); border-radius: 6px; padding: 6px 10px; font-size: 13px; margin: 0 0 8px; }
 .empty { color: var(--muted); padding: 24px 0; }
@@ -87,8 +90,9 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
   const fields = index(D.fields), datasets = index(D.datasets), rules = index(D.rules);
   const columns = index(D.columns), tables = index(D.tables);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const builders = {};
+  const builders = {}, outputTests = {};
   for (const x of [...(D.outputs || []), ...(D.entities || [])]) if (x.dataset && x.built_by) builders[x.dataset] = x.built_by;
+  for (const o of D.outputs || []) if (o.dataset) outputTests[o.dataset] = o.tests || [];
   const guards = {};
   for (const q of D.quality || []) for (const t of q.targets || []) (guards[t] = guards[t] || []).push(q);
 
@@ -138,6 +142,15 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
       ((q.report_checks || []).length ? ' · the report relies on it' : '')).join('<br>') + '</div>' : '';
   }
   function step(s) { return s ? ' · built by <b>' + esc(s.label) + '</b>' : ''; }
+  // how the build plan proves it, in words; a missing test is said, never filled in
+  const PROVES = {unit: 'Tested on its worked example', contract: 'Its promised shape is tested', parity: 'Compared with the figures it replaces',
+    rerun: 'Run twice for the same period, same result', regression: 'Past periods stay as they were', integration: 'Tested with the real sources',
+    forced_failure: 'A failure is made on purpose', flow: 'Tested in a whole run'};
+  function proved(tests, needed, missing) {
+    const lines = (tests || []).map((t) => '<span>' + esc(PROVES[t.kind] || 'Tested') + ':</span> ' + esc(t.label)).join('<br>');
+    return (lines ? '<div class="t">' + lines + '</div>' : '') +
+      (!(tests || []).some((t) => t.kind === needed) ? '<div class="gap">' + esc(missing) + '</div>' : '');
+  }
   const LAYER = {gold: 'Output field (gold)', silver: 'Conformed field (silver)', bronze: 'Raw copy (bronze)'};
   function render(id, seen) {
     if (seen.has(id)) return '<div class="rel">(already shown above)</div>';
@@ -148,7 +161,8 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
         '<div class="meta">' + [f.term && 'means ' + f.term, f.required ? 'always filled' : null, d.label && 'in ' + d.label]
           .filter(Boolean).map(esc).join(' · ') + step(builders[f.dataset]) + '</div>' +
         (d.contract ? '<div class="meta">promised by ' + esc(d.contract.label) + (d.contract.version && !String(d.contract.label).includes(d.contract.version) ? ' v' + esc(d.contract.version) : '') + '</div>' : '') +
-        guarded(id, f.dataset) + '</div>';
+        guarded(id, f.dataset) +
+        (outputTests[f.dataset] ? proved(outputTests[f.dataset], 'parity', 'Nothing compares this output yet with the figures it replaces.') : '') + '</div>';
       let up = '';
       if (f.derived_by) up += '<div class="rel">calculated by</div>' + render(f.derived_by, seen);
       for (const s of f.fed_by || []) up += '<div class="rel">copied from</div>' + render(s, seen);
@@ -161,7 +175,7 @@ ul.edge { margin: 4px 0 0; padding-left: 18px; font-size: 12px; color: var(--mut
       let html = '<div class="card rule"><div class="kind">Calculation rule' + (r.kind ? ': ' + esc(words(r.kind)) : '') + '</div><h3>' + esc(r.label) + '</h3>' +
         (r.logic ? '<div class="meta">' + esc(r.logic) + '</div>' : '') +
         '<div class="meta">' + [words(r.period_dependency), r.examples ? (r.examples === 1 ? 'one worked example' : r.examples + ' worked examples') : null].filter(Boolean).map(esc).join(' · ') + step(r.built_by) + '</div>' +
-        (cases ? '<ul class="edge">' + cases + '</ul>' : '') + '</div>';
+        (cases ? '<ul class="edge">' + cases + '</ul>' : '') + proved(r.tests, 'unit', 'No test runs its worked example on the built pipeline yet.') + '</div>';
       if (!r.examples) html += '<div class="gap">No worked example yet: a person works one out to check the rule.</div>';
       const up = (r.inputs || []).map((i) => '<div class="rel">from</div>' + render(i, seen)).join('');
       return html + (up ? '<div class="up">' + up + '</div>' : '');

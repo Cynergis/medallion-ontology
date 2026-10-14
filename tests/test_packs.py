@@ -73,7 +73,7 @@ def _lineage(tmp_path, pack, view):
     _oto("build", "--project", root, "--target", "site", "--view", view)
     text = open(os.path.join(root, "build", "site", "data.js"), encoding="utf-8").read()
     data = json.loads(text[text.index("=") + 1:].strip().rstrip(";"))
-    return {kind: {x["id"]: x for x in data[kind]} for kind in ("fields", "rules", "columns", "tables", "quality")}
+    return {kind: {x["id"]: x for x in data[kind]} for kind in ("fields", "rules", "columns", "tables", "quality", "outputs")}
 
 
 def test_the_lineage_view_walks_a_gold_field_up_to_its_source(tmp_path):
@@ -88,6 +88,8 @@ def test_the_lineage_view_walks_a_gold_field_up_to_its_source(tmp_path):
     assert data["tables"][column["table"]]["copy"]["built_by"]["kind"] == "copy_to_bronze"
     assert rank["report"] == [], "without the bridge the report part is empty"
     assert {q["gate"] for q in data["quality"].values()} == {1, 2, 3}
+    assert {t["kind"] for t in rule["tests"]} == {"unit"}, "the rule says how the build plan proves it"
+    assert {t["kind"] for t in data["outputs"]["output.portfolio-holdings"]["tests"]} == {"contract", "parity"}
 
 
 def test_with_the_bridge_the_lineage_view_shows_the_report_field_on_top(tmp_path):

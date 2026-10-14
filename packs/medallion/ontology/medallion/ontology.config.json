@@ -1,5 +1,5 @@
 {
-  "_about": "The medallion pipeline: its batch flow on the flow's terms (release 1) and its design (release 2): the classes of the specification's steps D1 to D7 and D9, and how the flow executes them. Names follow DECISIONS.md.",
+  "_about": "The medallion pipeline: its batch flow on the flow's terms (release 1), its design (release 2): the classes of the specification's steps D1 to D7 and D9, and how the flow executes them, and the build plan's tests (release 3). Names follow DECISIONS.md.",
   "_summary": "A medallion data pipeline, source systems to bronze, silver and gold: its sources, reference data, conformed entities, gold outputs and contracts, derivation and quality rules, build plan, and the batch flow that executes them, with the rules a design and a declared flow must satisfy.",
   "name": "Medallion pipeline",
   "ontology_version": 1,
@@ -82,6 +82,9 @@
     },
     "Identity": {
       "definition": "A principal the pipeline runs as or a person who reads it: its kind, the environment, its access to datasets (D9)."
+    },
+    "PipelineTest": {
+      "definition": "A test the build plan promises, and what it proves: its kind (unit, contract, parity, rerun, regression, integration, forced failure, flow), the rule, output, runbook or flow it tests, what it runs on and what must come out (D9). Not a flow TestObligation, which a step's checks derive for its code (DECISIONS.md)."
     }
   },
   "properties": {
@@ -417,6 +420,13 @@
       "inverse": "resumed_by",
       "label": "resumes from",
       "definition": "The step a recovery resumes the flow from."
+    },
+    "test_of": {
+      "domain": "PipelineTest",
+      "range": "DerivationRule|QualityRule|Output|Runbook|Flow",
+      "inverse": "tested_by",
+      "label": "test of",
+      "definition": "What a test proves: a derivation rule, a quality rule, an output, a runbook or a flow."
     }
   },
   "attributes": {
@@ -884,6 +894,25 @@
         "type": "list",
         "label": "access",
         "definition": "Its access, as layer: mode (bronze: read, silver: write…)."
+      }
+    },
+    "PipelineTest": {
+      "test_kind": {
+        "type": "enum:unit|contract|parity|rerun|regression|integration|forced_failure|flow",
+        "label": "test kind",
+        "definition": "unit (a rule on its example), contract (an output keeps its contract's shape), parity (an output matches what it replaces, or an independent calculation), rerun (a batch run twice writes the same rows), regression (what changed leaves past periods as they were), integration (the steps work together on real sources), forced_failure (a failure made on purpose stops the batch and its runbook recovers it), flow (the whole batch, in order, ends validated).",
+        "required": true
+      },
+      "fixture": {
+        "type": "string",
+        "label": "fixture",
+        "definition": "What it runs on: input rows, a fixture file, a past period's batch, a reference output."
+      },
+      "expected_result": {
+        "type": "string",
+        "label": "expected result",
+        "definition": "What must come out: rows or the fixture holding them, a figure within a tolerance, the step a batch stops at and who is told.",
+        "required": true
       }
     }
   }

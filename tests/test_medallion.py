@@ -198,6 +198,21 @@ def mutate(name, cap):
         unlink(c, step("fp-09b"), "executes", "output.portfolio-allocations")
     elif name == "an entity fed by a source it has no identity mapping for":
         unlink(c, "conformedentity.fund", "has_identity_mapping", "identitymapping.fund.dim-product")
+    # the build plan's tests (release 3)
+    elif name == "the rule has no unit test":
+        drop(c, "pipelinetest.holdings-top-10-unit")
+    elif name == "an output no parity test compares":
+        drop(c, "pipelinetest.portfolio-allocations-parity")
+    elif name == "the flow has no flow test":
+        drop(c, "pipelinetest.fund-profile-flow")
+    elif name == "the runbook's recovery is never tried":
+        drop(c, "pipelinetest.hard-gate-failure-forced")
+    elif name == "a test does not say what it runs on":
+        del item(c, "pipelinetest.fund-profile-rerun")["fields"]["fixture"]
+    elif name == "a parity test of a derivation rule":
+        link(c, "pipelinetest.portfolio-holdings-parity", "test_of", "derivationrule.holdings-top-10")
+    elif name == "the flow test tests an output instead":
+        item(c, "pipelinetest.fund-profile-flow")["links"]["test_of"] = [L("output.portfolio-holdings")]
     return c
 
 
@@ -225,6 +240,13 @@ SCENARIOS = {
     "a rule does not say what happens on a tie": (["rule-answers-tie"], False, []),
     "an output no step executes": ([], False, ["MD16"]),
     "an entity fed by a source it has no identity mapping for": ([], False, ["MD7"]),
+    "the rule has no unit test": ([], False, ["MD30"]),
+    "an output no parity test compares": ([], False, ["MD31"]),
+    "the flow has no flow test": ([], False, ["MD32"]),
+    "the runbook's recovery is never tried": ([], False, ["MD33"]),
+    "a test does not say what it runs on": ([], False, ["MD34"]),
+    "a parity test of a derivation rule": (["a-parity-test-tests-an-output"], True, []),
+    "the flow test tests an output instead": (["a-flow-test-tests-a-flow"], True, ["MD32"]),
 }
 
 
@@ -266,6 +288,33 @@ def test_a_design_and_its_flow_are_accepted_refused_flagged_or_reported(project,
         assert "question %s violated" % qid in out or "question %s unanswered" % qid in out, "expected a gap on %s:\n%s" % (qid, out)
     if not rules and not refused:
         assert not fired, "unexpected findings: %s" % sorted(fired)
+
+
+def test_a_test_that_says_nothing_it_expects_is_not_captured(project):
+    """A test is its expected result: one without it is refused when the capture is proposed, before any check."""
+    cap = capture_from_sample()
+    del item(cap, "pipelinetest.fund-profile-flow")["fields"]["expected_result"]
+    path = os.path.join(project, "captures", "capture.json")
+    json.dump(cap, open(path, "w", encoding="utf-8"), indent=1)
+    run("curate", "abort", "--project", project)
+    assert run("curate", "start", "--project", project)[0] == 0
+    code, out = run("curate", "propose", "--project", project, "--from", path)
+    run("curate", "abort", "--project", project)
+    assert code != 0 and "expected_result is required and missing" in out, out
+
+
+def test_the_sample_closes_the_build_plan():
+    """D9 can close on the sample: every rule, output, medallion flow and runbook that resumes it has its test."""
+    graph = json.load(open(os.path.join(UNIT, "sample.graph.json"), encoding="utf-8"))
+    kinds = {n["id"]: n["type"] for n in graph["nodes"]}
+    tests = {n["id"]: n["attributes"]["test_kind"] for n in graph["nodes"] if n["type"] == "PipelineTest"}
+    tested = {(tests[e["from"]], e["to"]) for e in graph["edges"] if e["rel"] == "test_of"}
+    resumes = {e["from"] for e in graph["edges"] if e["rel"] == "resumes_from"}
+    for nid, kind in kinds.items():
+        need = {"DerivationRule": "unit", "Output": "parity", "Flow": "flow"}.get(kind) or ("forced_failure" if nid in resumes else None)
+        if need:
+            assert (need, nid) in tested, "%s has no %s test" % (nid, need)
+    assert set(tests.values()) >= {"unit", "contract", "parity", "rerun", "flow", "forced_failure"}
 
 
 # ---- the bridge ----

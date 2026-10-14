@@ -46,16 +46,24 @@ The classes of the specification's steps D1–D7 and D9, named as decided in
 | D6 rules | `DerivationRule`, `EdgeCase`, `RuleExample` |
 | D7 quality | `QualityRule` (carried out by a flow `Check` on its gate's step), `Tolerance`, `FailureAction` |
 | D8 flow | a step `executes` the copy policy, entity, output or rule it runs; an artifact `represents` its dataset or source table |
-| D9 build plan | `Identity`; environments and runbooks are `software-architecture`'s, tests `flow`'s |
+| D9 build plan | `Identity`; `PipelineTest` (release 3): a unit, contract, parity, rerun, regression, integration, forced-failure or flow test, what it is a `test_of`, its fixture and expected result; environments and runbooks are `software-architecture`'s |
 
 **Correctness refuses, completeness reports.** A design that contradicts itself is refused at
 `oto curate check`: a field both derived and fed, a rule reading a higher layer than it writes, a
 step executing what its kind does not build, two steps executing one thing, an artifact in another
 layer than its dataset, an entity or output step not writing its table, a person writing silver or
-gold. What is missing is a gap, reported, not blocking, so a design fills group by group: the
-questions MD3 to MD17 must come back empty before a step's checkpoint (the specification's section
-5). The five standard edge cases of a rule are warnings. MD21 to MD29 are the catalogue a reviewer
-reads at each checkpoint.
+gold, a test of another kind than what it tests. What is missing is a gap, reported, not blocking,
+so a design fills group by group: the questions MD3 to MD17 and MD30 to MD34 must come back empty
+before a step's checkpoint (the specification's section 5). The five standard edge cases of a rule
+are warnings. MD21 to MD29 and MD35 are the catalogue a reviewer reads at each checkpoint.
+
+**The build plan's tests (release 3).** Every derivation rule has a unit test, every output a
+parity test, every medallion flow a flow test, and every runbook that resumes it a forced-failure
+test (MD30 to MD33); every test says what it runs on (MD34) and what must come out (required). A
+unit test proves a rule, a contract or parity test an output, a flow test a flow, a forced-failure
+test a quality rule or a runbook; rerun, regression and integration tests may test any of them.
+The sample's seven tests close the build plan. A `PipelineTest` is not `flow`'s `TestObligation`,
+which a step's checks derive for that step's code (DECISIONS.md).
 
 ## The bridge: report-medallion
 

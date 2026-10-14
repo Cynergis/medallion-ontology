@@ -64,3 +64,27 @@ Decided by Chiheb Dkhil.
 
 The bridge's own pack decided by Chiheb Dkhil; the view's place and the checkpoint rule proposed
 with the packs, confirmed by merging them.
+
+## 2026-10-14: the build plan's tests (release 3)
+
+- **A test the build plan promises is a `PipelineTest`**: its kind, what it is a `test_of` (a
+  derivation rule, a quality rule, an output, a runbook or a flow), what it runs on (`fixture`) and
+  what must come out (`expected_result`, required). *Why:* the implementation agent writes each test
+  from its fixture and expected result, and what nothing tests shows as missing. The specification's
+  name *Test* would read as any test of the product; `flow`'s `TestObligation` is another thing,
+  derived from a step's checks for that step's code, not promised by the build plan for the design.
+- **The specification's eight kinds**: unit, contract, parity, rerun, regression, integration,
+  forced failure, flow. Five are tied to what they prove, refused otherwise: a unit test a rule
+  (derivation or quality), a contract or parity test an output, a flow test a flow, a forced-failure
+  test a quality rule or a runbook. Rerun, regression and integration tests may test any of them.
+  *Why:* each kind is generated from one template; a parity test of a rule has nothing to compare.
+- **What is missing is a gap, as for the rest of the design** (MD30 to MD34): a derivation rule with
+  no unit test, an output with no parity test, a medallion flow with no flow test, a runbook that
+  resumes it with no forced-failure test, a test that does not say what it runs on. D9 closes when
+  they come back empty; MD35 is its read-back. A test with no expected result is not captured.
+- **The relation is `test_of`, not `exercises`**: `product` already declares `exercises` (a
+  scenario is a concrete path through a requirement or a journey step), and a relation keeps one domain across the ontologies a product
+  composes.
+- **The lineage page shows how each rule and output is tested**, and says so when nothing tests it.
+
+Proposed with release 3, confirmed by merging it.

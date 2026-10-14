@@ -4,8 +4,8 @@ description: >-
   Design a medallion data pipeline for a part of a product, in an OTO project that composes
   `medallion`: the data product and its consumers, the sources and how each is copied to bronze,
   the reference data, the conformed silver entities, the gold outputs and their contracts, the
-  derivation and quality rules, the batch flow that runs them and the build plan, checkpoint by
-  checkpoint (D1 to D9), each refused by the medallion rules when it contradicts itself and
+  derivation and quality rules, the batch flow that runs them and the build plan with its tests,
+  checkpoint by checkpoint (D1 to D9), each refused by the medallion rules when it contradicts itself and
   reported when it is incomplete. Use when a part of the product is a data pipeline: "design the
   pipeline", "onboard a source", "define the gold output", "the quality rules at gate 2", "declare
   the batch flow", or when the software-architecture pack's architecture-build hands it a part that
@@ -18,7 +18,7 @@ A medallion pipeline is a design pattern for a part of a product, not for the wh
 product may model its application with DDD and its data with this pattern, and run both on the
 generic `flow`. This skill designs the part that is a pipeline. The `medallion` ontology decides
 what to ask: its classes say what an answer looks like, its rules refuse a design that contradicts
-itself, and its questions (MD1 to MD29) report what is missing.
+itself, and its questions (MD1 to MD35) report what is missing.
 
 The design says **what** the pipeline does, never **how** on a given platform: no engine,
 orchestrator, framework or language is captured here. That is the platform binding, a separate
@@ -89,7 +89,7 @@ how each is copied"), and what is open is what the question asks, never its numb
 | D6 Rules | each `DerivationRule`: kind, logic as a pattern, inputs, period dependency; every gold field `derived_by` a rule or `fed_by` a column or field, never both; a `RuleExample` worked out by a person, not by you; its `EdgeCase`s | MD9, MD11 | MD26, MD12 | analyst |
 | D7 Quality | each `QualityRule` at its gate (1 bronze, 2 silver, 3 gold): targets, assertion, hard or soft (a soft one says why), `Tolerance`, `FailureAction` (who is told, which runbook), a row that should fail it | MD13, MD14 | MD27, MD19 | platform lead, approver |
 | D8 Flow | once per data product, after D6 and D7 are closed: see below | MD15, MD16, MD17 | MD1, MD2, MD28 | platform lead |
-| D9 Build plan | the `Identity`s that run or read it, per `Environment`, with their access; the `Runbook`s and the step each `resumes_from` | — | MD18, MD29 | platform lead |
+| D9 Build plan | the `Identity`s that run or read it, per `Environment`, with their access; the `Runbook`s and the step each `resumes_from`; the `PipelineTest`s that prove it: kind, what it is a `test_of`, `fixture`, `expected_result` (see below) | MD30, MD31, MD32, MD33, MD34 | MD18, MD29, MD35 | platform lead |
 
 The five standard edge cases of a rule (a tie, a null input, missing history, an entity younger
 than the lookback, a duplicate input) are warnings until answered: ask each one, and record what
@@ -112,6 +112,27 @@ waits. Draft the steps from D2 to D7 (one copy per copy policy, one build per en
 one gate per layer), show them to the platform lead as a table (step, kind, waits for, group,
 reads, writes, executes), and capture what they confirm.
 
+## D9: the tests
+
+The build plan says what proves the pipeline before anyone relies on it. Draft the tests yourself
+from what D6 to D8 hold, show them to the platform lead as a table (the test, its kind, what it
+tests, what it runs on, what must come out), and capture what they confirm:
+
+- a **unit** test per derivation rule, on its worked example: the example's input is what it runs
+  on, its expected output what must come out;
+- a **parity** test per output: ask what it is compared with (the figures it replaces today, or an
+  independent calculation) and how far off a figure may be; never make up the figures;
+- a **contract** test per output that has a contract: its fields, types and keys, in order;
+- one **flow** test per medallion flow: a whole batch runs in order and ends validated;
+- a **forced-failure** test per runbook that resumes the flow: a quality rule's failing row at the
+  gate the runbook recovers; the batch stops, the right person is told, and the run resumes where
+  the runbook says;
+- a **rerun** test when the flow is resumable: the same batch run twice writes the same rows.
+
+Regression and integration tests are added when the platform lead asks for them. A test that does
+not say what it runs on is a gap; one that says nothing it expects is not captured. A test of the
+wrong kind for what it tests (a parity test of a rule) is refused: say what that kind proves.
+
 ## Finishing, and the build
 
 Report the checkpoints: which are closed, by whom; the open gaps per step with who can answer
@@ -123,7 +144,8 @@ report's value back to its source column).
 
 The pipeline shows on the product's studio page **Where the data comes from** (this pack's
 `lineage` view): pick a gold or silver field and it walks up to the source column, with the step that
-builds each part and the checks that guard it, and what is still missing on the way; a report field
+builds each part, the checks that guard it and the tests that prove it, and what is still missing on
+the way; a report field
 fed by it links to the report's page. Every project that declares this pack has it: `oto serve
 --project <root> --http <port>` serves the studio, and `oto build --project <root> --target site`
 writes it. Say so when a checkpoint closes, in plain words.
